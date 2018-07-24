@@ -426,7 +426,7 @@ NmCompareD (NmTangentPointD* v0, NmTangentPointD* v1)
    }
 
    // Normal
-   for (i = 0; i < 3; i++)
+   for (int i = 0; i < 3; i++)
    {
       if (fabs(v0->normal[i] - v1->normal[i]) > ATI_NORM_TINY)
       {
@@ -442,7 +442,7 @@ NmCompareD (NmTangentPointD* v0, NmTangentPointD* v1)
    }
 
    // Texture Coordinates.
-   for (i = 0; i < 2; i++)
+   for (int i = 0; i < 2; i++)
    {
       if (fabs(v0->uv[i] - v1->uv[i]) > ATI_TEX_TINY)
       {
@@ -529,7 +529,7 @@ NmCompareWithTexD (NmTangentPointD* v0, NmTangentPointD* v1)
    }
 
    // Normal
-   for (i = 0; i < 3; i++)
+   for (int i = 0; i < 3; i++)
    {
       if (fabs(v0->normal[i] - v1->normal[i]) > ATI_NORM_TINY)
       {
@@ -545,7 +545,7 @@ NmCompareWithTexD (NmTangentPointD* v0, NmTangentPointD* v1)
    }
 
    // Texture Coordinates.
-   for (i = 0; i < 2; i++)
+   for (int i = 0; i < 2; i++)
    {
       if (fabs(v0->uv[i] - v1->uv[i]) > ATI_TEX_TINY)
       {
@@ -562,7 +562,7 @@ NmCompareWithTexD (NmTangentPointD* v0, NmTangentPointD* v1)
    }
 
    // Tangent
-   for (i = 0; i < 3; i++)
+   for (int i = 0; i < 3; i++)
    {
       if (fabs(v0->tangent[i] - v1->tangent[i]) > ATI_NORM_TINY)
       {
@@ -578,7 +578,7 @@ NmCompareWithTexD (NmTangentPointD* v0, NmTangentPointD* v1)
    }
 
    // Binormal
-   for (i = 0; i < 3; i++)
+   for (int i = 0; i < 3; i++)
    {
       if (fabs(v0->binormal[i] - v1->binormal[i]) > ATI_NORM_TINY)
       {
@@ -624,7 +624,7 @@ NmCompareNoTexD (NmTangentPointD* v0, NmTangentPointD* v1)
    }
 
    // Normal
-   for (i = 0; i < 3; i++)
+   for (int i = 0; i < 3; i++)
    {
       if (fabs(v0->normal[i] - v1->normal[i]) > ATI_NORM_TINY)
       {
