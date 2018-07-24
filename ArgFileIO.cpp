@@ -13,10 +13,6 @@
 #include <string.h>
 #include <math.h>
 
-#ifdef ATI_MAC_OS
- #include "MacSpecific.h"
-#endif
-
 #include "ArgFileIO.h"
 
 ////////////////////////////////////////////////////////////////////
@@ -45,10 +41,6 @@ AtiRead3DARGImageFile (AtiBitmap *bmp, char *fileName)
       fclose (fp);
       return false;
    }
-   
-#ifdef ATI_MAC_OS
-   AtiByteSwap_AtiBitmap(bmp, 1);
-#endif
 
    //============================//
    // Allocate memory for texels //
@@ -96,11 +88,6 @@ AtiWrite3DARGImageFile (AtiBitmap *bmp, char *fileName)
       return false;
    }
 
-#ifdef ATI_MAC_OS
-   // swap and write out bmp header 
-   AtiByteSwap_AtiBitmap(bmp, 1);
-#endif
-
    //=============//
    // Write header //
    //=============//
@@ -111,11 +98,6 @@ AtiWrite3DARGImageFile (AtiBitmap *bmp, char *fileName)
       fclose (fp);
       return false;
    }
-
-#ifdef ATI_MAC_OS
-   // undo swap 
-   AtiByteSwap_AtiBitmap(bmp, 1);
-#endif
 
    //=========================//
    // Read texels into memory //

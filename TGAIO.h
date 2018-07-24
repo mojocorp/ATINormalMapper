@@ -9,9 +9,7 @@
 #ifndef __TGAIO__H
 #define __TGAIO__H
 
-#ifndef ATI_MAC_OS
- #include <windows.h>
-#endif
+#include <Types.h>
 
 #include <stdio.h>
 
@@ -21,33 +19,33 @@
 
 typedef struct _TGAHeaderInfo
 {
-   BYTE idlen;    //length of optional identification sequence
-   BYTE cmtype;   //indicates whether a palette is present
-   BYTE imtype;   //image data type (e.g., uncompressed RGB)
-   WORD cmorg;    //first palette index, if present
-   WORD cmcnt;    //number of palette entries, if present
-   BYTE cmsize;   //number of bits per palette entry
-   WORD imxorg;   //horiz pixel coordinate of lower left of image
-   WORD imyorg;   //vert pixel coordinate of lower left of image
-   WORD imwidth;  //image width in pixels
-   WORD imheight; //image height in pixels
-   BYTE imdepth;  //image color depth (bits per pixel)
-   BYTE imdesc;   //image attribute flags
+   uint8 idlen;    //length of optional identification sequence
+   uint8 cmtype;   //indicates whether a palette is present
+   uint8 imtype;   //image data type (e.g., uncompressed RGB)
+   uint16 cmorg;    //first palette index, if present
+   uint16 cmcnt;    //number of palette entries, if present
+   uint8 cmsize;   //number of bits per palette entry
+   uint16 imxorg;   //horiz pixel coordinate of lower left of image
+   uint16 imyorg;   //vert pixel coordinate of lower left of image
+   uint16 imwidth;  //image width in pixels
+   uint16 imheight; //image height in pixels
+   uint8 imdepth;  //image color depth (bits per pixel)
+   uint8 imdesc;   //image attribute flags
 }TGAHeaderInfo;
 
 typedef struct _pixel
 {
-   BYTE red;
-   BYTE blue;
-   BYTE green;
-   BYTE alpha;
+   uint8 red;
+   uint8 blue;
+   uint8 green;
+   uint8 alpha;
 } pixel;
 
 #pragma pack (pop)
 
 extern bool TGAWriteImage (FILE* fp, int width, int height, int bpp,
-                           BYTE* image, bool aSwapRedBlue = false);
+                           uint8* image, bool aSwapRedBlue = false);
 extern bool TGAReadImage (FILE* fp, int* width, int* height, int* bitDepth,
-                          BYTE** pixels);
+                          uint8** pixels);
 
 #endif // __TGAIO__H

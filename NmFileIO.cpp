@@ -15,10 +15,6 @@
 
 #include "NmFileIO.h"
 
-#ifdef ATI_MAC_OS
- #include "MacSpecific.h"
-#endif
-
 using namespace std;
 
 //#define NEW_WAY
@@ -43,15 +39,8 @@ NmWriteTriangles (FILE* fp, int numTris, NmRawTriangle* tris)
    strncpy (header.hdr, NMF_HEADER_TAG, 4);
    header.size = sizeof (NmHeader) + sizeof (int) + 
                  (sizeof(NmRawTriangle) * numTris);
-   
-#ifdef ATI_MAC_OS
-   NmHeader bsHeader;
-   memcpy(&bsHeader, &header, sizeof(NmHeader));
-   AtiByteSwap_NmHeader(&bsHeader, 1);
-   if (fwrite (&bsHeader, sizeof (NmHeader), 1, fp) != 1)
-#else  
+    
    if (fwrite (&header, sizeof (NmHeader), 1, fp) != 1)
-#endif
    {
       cerr << "Unable to write NMF header\n";
       return false;
@@ -61,58 +50,25 @@ NmWriteTriangles (FILE* fp, int numTris, NmRawTriangle* tris)
    strncpy (header.hdr, NMF_TRIANGLE_TAG, 4);
    header.size = sizeof (int) + sizeof(NmRawTriangle) * numTris;
    
-#ifdef ATI_MAC_OS
-   memcpy(&bsHeader, &header, sizeof(NmHeader));
-   AtiByteSwap_NmHeader(&bsHeader, 1);   
-   if (fwrite (&bsHeader, sizeof (NmHeader), 1, fp) != 1)
-#else  
    if (fwrite (&header, sizeof (NmHeader), 1, fp) != 1)
-#endif
    {
       cerr << "Unable to write triangle header\n";
       return false;
    }
    
    // Write the number of triangles.
-#ifdef ATI_MAC_OS
-   int bsNumTris = numTris;
-   AtiByteSwap_int32(&bsNumTris, 1);
-   if (fwrite (&bsNumTris, sizeof (int), 1, fp) != 1)
-#else
    if (fwrite (&numTris, sizeof (int), 1, fp) != 1)
-#endif
    {
       cerr << "Unable to write number of triangles\n";
       return false;
    }
    
    // Write the triangles.
-#ifdef ATI_MAC_OS
-   NmRawTriangle* bsTris = (NmRawTriangle*)malloc((numTris+1)*sizeof(NmRawTriangle));
-   if (bsTris == NULL)
-   {
-      cerr << "Unable to write triangles\n";
-      return false;
-   }
-   
-   memcpy(bsTris, tris, numTris*sizeof(NmRawTriangle));
-   AtiByteSwap_NmRawTriangle(bsTris, numTris);
-     
-   if (fwrite (bsTris, sizeof(NmRawTriangle), numTris, fp) != (unsigned)numTris)
-   {
-      cerr << "Unable to write triangles\n";
-      //free(bsTris);
-      return false;
-   }
-
-   free(bsTris);
-#else
    if (fwrite (tris, sizeof(NmRawTriangle), numTris, fp) != (unsigned)numTris)
    {
       cerr << "Unable to write triangles\n";
       return false;
    }
-#endif
      
    return true;
 } // end NmWriteTriangles
@@ -129,10 +85,6 @@ NmReadTriangleChunk (FILE* fp, int* numTris, NmRawTriangle** tris)
       cerr << "Unable to read number of triangles\n";
       return false;
    }
-   
-   #ifdef ATI_MAC_OS
-    AtiByteSwap_int32(numTris, 1);
-   #endif
    
    if ((*numTris) < 1)
    {
@@ -166,10 +118,6 @@ NmReadTriangleChunk (FILE* fp, int* numTris, NmRawTriangle** tris)
       return false;
    }
    
-   #ifdef ATI_MAC_OS
-    AtiByteSwap_NmRawTriangle((*tris), (*numTris));
-   #endif
-   
    // success
    return true;
 }
@@ -188,10 +136,6 @@ NmFileHasTriangles (FILE* fp)
       {
          return false;
       }
-      
-      #ifdef ATI_MAC_OS
-       AtiByteSwap_NmHeader(&header, 1);
-      #endif
 
       // Check if it's the NMF chunk
       if (strncmp (header.hdr, NMF_HEADER_TAG, 4) == 0)
@@ -203,10 +147,6 @@ NmFileHasTriangles (FILE* fp)
            {
               return false;
            }
-           
-           #ifdef ATI_MAC_OS
-            AtiByteSwap_NmHeader(&header, 1);
-           #endif
 
            // Check if it's the triangle chunk we are looking for.
            if (strncmp (header.hdr, NMF_TRIANGLE_TAG, 4) == 0)
@@ -251,10 +191,6 @@ NmReadTriangles (FILE* fp, int* numTris, NmRawTriangle** tris)
          cerr << "Unable to read header\n";
          return false;
       }
-      
-      #ifdef ATI_MAC_OS
-       AtiByteSwap_NmHeader(&header, 1);
-      #endif
 
       // Check if it's the NMF chunk
       if (strncmp (header.hdr, NMF_HEADER_TAG, 4) == 0)
@@ -267,10 +203,6 @@ NmReadTriangles (FILE* fp, int* numTris, NmRawTriangle** tris)
               cerr << "Unable to read header\n";
               return false;
            }
-           
-           #ifdef ATI_MAC_OS
-            AtiByteSwap_NmHeader(&header, 1);
-           #endif
 
            // Check if it's the triangle chunk we are looking for.
            if (strncmp (header.hdr, NMF_TRIANGLE_TAG, 4) == 0)
@@ -404,11 +336,7 @@ DotProduct3D (double vectorA[3], double vectorB[3])
 //=============================================================================
 static int
 NmCompareD (NmTangentPointD* v0, NmTangentPointD* v1)
-{
-#ifdef ATI_MAC_OS
-   int i;
-#endif // ATI_MAC_OS
-     
+{    
    // Positions.
    for (int i = 0; i < 3; i++)
    {
@@ -508,10 +436,6 @@ NmCompareD (NmTangentPointD* v0, NmTangentPointD* v1)
 static int
 NmCompareWithTexD (NmTangentPointD* v0, NmTangentPointD* v1)
 {
-#ifdef ATI_MAC_OS
-   int i;
-#endif // ATI_MAC_OS
-
    // Positions.
    for (int i = 0; i < 3; i++)
    {
@@ -603,10 +527,6 @@ NmCompareWithTexD (NmTangentPointD* v0, NmTangentPointD* v1)
 static int
 NmCompareNoTexD (NmTangentPointD* v0, NmTangentPointD* v1)
 {
-#ifdef ATI_MAC_OS
-   int i;
-#endif // ATI_MAC_OS
-
    // Positions.
    for (int i = 0; i < 3; i++)
    {

@@ -13,26 +13,22 @@
 #include <string.h>
 #include <math.h>
 
-#ifdef ATI_MAC_OS
- #include "MacSpecific.h"
-#endif
-
 #include "TGAIO.h"
 
 ////////////////////////////////////////////////////////////////////
 // Write the TGA image.
 ////////////////////////////////////////////////////////////////////
 bool 
-TGAWriteImage (FILE* fp, int width, int height, int bitDepth, BYTE* image,
+TGAWriteImage (FILE* fp, int width, int height, int bitDepth, uint8* image,
                bool aSwapRedBlue)
 {
    int i;
    int bytesRead;
    TGAHeaderInfo TGAHeader;
-   BYTE *texels;
+   uint8 *texels;
    
-   BYTE *ptr1;
-   BYTE *ptr2;
+   uint8 *ptr1;
+   uint8 *ptr2;
    
    /***************************/
    /* Check for NULL pointers */
@@ -55,7 +51,7 @@ TGAWriteImage (FILE* fp, int width, int height, int bitDepth, BYTE* image,
    /****************************/
    /* Swap red and blue colors */
    /****************************/
-   texels = new BYTE [width*height*bitDepth/8];
+   texels = new uint8 [width*height*bitDepth/8];
    if (texels == NULL)
    {
       fprintf (stderr, "ERROR allocAtiIng memory for texel array!\n");
@@ -105,13 +101,8 @@ TGAWriteImage (FILE* fp, int width, int height, int bitDepth, BYTE* image,
    TGAHeader.imyorg = 0;   //vert pixel coordinate of lower left of image
    TGAHeader.imwidth = (unsigned short)width;  //image width in pixels
    TGAHeader.imheight = (unsigned short)height; //image height in pixels
-   TGAHeader.imdepth = (BYTE)bitDepth;  //image color depth (bits per pixel)
+   TGAHeader.imdepth = (uint8)bitDepth;  //image color depth (bits per pixel)
    TGAHeader.imdesc = 8;   //image attribute flags
-   
-   #ifdef ATI_MAC_OS
-    // swap and write out header
-    AtiByteSwap_TGAHeaderInfo(&TGAHeader, 1);
-   #endif
    
    /**********************/
    /* Write TARGA header */
@@ -122,11 +113,6 @@ TGAWriteImage (FILE* fp, int width, int height, int bitDepth, BYTE* image,
       return false;
    }
    
-   #ifdef ATI_MAC_OS
-    // un-swap
-    AtiByteSwap_TGAHeaderInfo(&TGAHeader, 1);
-   #endif
-   
    /****************/
    /* Write texels */
    /****************/
@@ -135,7 +121,7 @@ TGAWriteImage (FILE* fp, int width, int height, int bitDepth, BYTE* image,
       int j = 8192000;
       if (i+8192000 > width*height*bitDepth/8)
          j = width*height*bitDepth/8 - i;
-      if ((bytesRead = fwrite(&texels[i], sizeof(BYTE), j, fp)) != j)
+      if ((bytesRead = fwrite(&texels[i], sizeof(uint8), j, fp)) != j)
       {
          fprintf (stderr, "ERROR! Texels not written successfully! Wrote %d instead of  %d\n", bytesRead, j);
          return false;
@@ -155,7 +141,7 @@ TGAWriteImage (FILE* fp, int width, int height, int bitDepth, BYTE* image,
 
 //=============================================================================
 bool
-TGAReadImage (FILE* fp, int* width, int* height, int* bitDepth, BYTE** pixels)
+TGAReadImage (FILE* fp, int* width, int* height, int* bitDepth, uint8** pixels)
 {
    //===================//
    // Read TARGA header //
@@ -166,10 +152,6 @@ TGAReadImage (FILE* fp, int* width, int* height, int* bitDepth, BYTE** pixels)
       fprintf (stderr, "ERROR! Bad Targa header!\n");
       return false;
    }
-   
-   #ifdef ATI_MAC_OS
-    AtiByteSwap_TGAHeaderInfo(&TGAHeader, 1);
-   #endif
 
    (*width) = TGAHeader.imwidth;
    (*height) = TGAHeader.imheight;
@@ -188,7 +170,7 @@ TGAReadImage (FILE* fp, int* width, int* height, int* bitDepth, BYTE** pixels)
    //============================//
    // Allocate memory for texels //
    //============================//
-   (*pixels) = new BYTE [numTexels];
+   (*pixels) = new uint8 [numTexels];
    if ((*pixels) == NULL)
    {
       fprintf (stderr, "ERROR allocating memory for pixels\n");
@@ -198,7 +180,7 @@ TGAReadImage (FILE* fp, int* width, int* height, int* bitDepth, BYTE** pixels)
    //=========================//
    // Read texels into memory //
    //=========================//
-   if (fread ((*pixels), sizeof(BYTE), numTexels, fp) != (unsigned)numTexels)
+   if (fread ((*pixels), sizeof(uint8), numTexels, fp) != (unsigned)numTexels)
    {      
       fprintf (stderr, "ERROR! Couldn't read texels!\n");
       return false;

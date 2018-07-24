@@ -6,10 +6,8 @@
 // (C) 2002 ATI Research, Inc., All rights reserved.
 //=============================================================================
 
-#ifndef ATI_MAC_OS
- #include <windows.h>
-#endif
 #include <stdio.h>
+#include <cstdlib>
 
 #include "NmFileIO.h"
 

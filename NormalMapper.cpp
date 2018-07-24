@@ -13,6 +13,9 @@
 #include <stdio.h>
 #include <math.h>
 #include <float.h>
+#include <cstdlib>
+#include <cstring>
+#include <cstdarg>
 
 #include "NmFileIO.h"
 #include "TGAIO.h"
@@ -24,9 +27,9 @@ static char* versionString =  "NormalMapper v03.02.02\n";
 
 //#define USE_SMD_FILES
 
-#define PACKINTOBYTE_MINUS1TO1(X)  ((BYTE)((X)*127.5+127.5))
+#define PACKINTOBYTE_MINUS1TO1(X)  ((uint8)((X)*127.5+127.5))
 #define UNPACKBYTE_MINUS1TO1(x)    ((((float)(x)-127.5)/127.5))
-#define PACKINTOBYTE_0TO1(x)       ((BYTE)((x)*255))
+#define PACKINTOBYTE_0TO1(x)       ((uint8)((x)*255))
 #define UNPACKBYTE_0TO1(x)         (((float)(x)/255.0f))
 
 #define PACKINTOSHORT_0TO1(x)      ((unsigned short)((x)*65535))
@@ -83,8 +86,8 @@ typedef struct
 // Experimental pixel format.      
 typedef union
 {
-   struct { BYTE r, g, b, a; };
-   struct { BYTE v[4]; };
+   struct { uint8 r, g, b, a; };
+   struct { uint8 v[4]; };
 } NmExpPixel;
 
 // Local print routines.
@@ -1392,7 +1395,7 @@ Fetch (float* map, int width, int height, double u, double v, double bumpN[3])
 // Get a pixel from the image.
 //////////////////////////////////////////////////////////////////////////
 static inline void 
-ReadPixel (BYTE* image, int width, int off, pixel* pix, int x, int y)
+ReadPixel (uint8* image, int width, int off, pixel* pix, int x, int y)
 {
 #ifdef _DEBUG
    if ((image == NULL) || (pix == NULL))
@@ -1446,7 +1449,7 @@ GetBumpMapFromHeightMap (char* bumpName, int* bumpWidth,  int* bumpHeight,
       NmPrint ("ERROR: Unable to open %s\n", bumpName);
       exit (-1);
    }
-   BYTE* image;
+   uint8* image;
    int bpp;
    if (!TGAReadImage (fp, bumpWidth, bumpHeight, &bpp, &image))
    {
@@ -2875,7 +2878,7 @@ WriteOutputImage (char* fName, float* img, int numComponents)
       case NORM_OUTPUT_8_8_8_TGA:
          {
             // Convert image
-            BYTE* outImg = new BYTE[gWidth*gHeight*3];
+            uint8* outImg = new uint8[gWidth*gHeight*3];
             NmPrint ("\rConverting to 8x8x8 Targa\n");
             for (int y = 0; y < gHeight; y++)
             {
@@ -2916,7 +2919,7 @@ WriteOutputImage (char* fName, float* img, int numComponents)
       case NORM_OUTPUT_8_8_8_8_TGA:
          {
             // Convert image
-            BYTE* outImg = new BYTE[gWidth*gHeight*4];
+            uint8* outImg = new uint8[gWidth*gHeight*4];
             NmPrint ("\rConverting to 8x8x8x8 Targa\n");
             for (int y = 0; y < gHeight; y++)
             {
@@ -2965,7 +2968,7 @@ WriteOutputImage (char* fName, float* img, int numComponents)
       case NORM_OUTPUT_EXP_TGA:
          {
             // Convert image
-            BYTE* outImg = new BYTE[gWidth*gHeight*4];
+            uint8* outImg = new uint8[gWidth*gHeight*4];
             NmExpPixel jp;
             NmPrint ("\rConverting to experimental format\n");
             for (int y = 0; y < gHeight; y++)
