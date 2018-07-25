@@ -41,6 +41,7 @@ set(SOURCES
     NmFileIO.cpp
     TGAIO.cpp
     ArgFileIO.cpp
+    FileDialog_win.cpp
 )
 add_library(Common STATIC ${SOURCES})
 
@@ -94,9 +95,11 @@ target_link_libraries (WorldSpaceifier LINK_PUBLIC Common)
 
 set(SOURCES
     TGAtoDOT3.cpp
+    MessageBox_win.cpp
     NormalMapper.rc
 )
 add_executable(TGAtoDOT3 WIN32 ${SOURCES})
+target_link_libraries (TGAtoDOT3 LINK_PUBLIC Common)
 
 # Install
 install(TARGETS NMFConvert DESTINATION bin)

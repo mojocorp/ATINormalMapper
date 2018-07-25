@@ -5,6 +5,8 @@
 #include <math.h>
 #include <stdio.h>
 #include <windows.h>
+#include <MessageBox.h>
+#include <FileDialog.h>
 
 // Targa header info
 #pragma pack(push)
@@ -56,37 +58,6 @@ PackFloatInByte(float in)
     return (BYTE)((in + 1.0f) / 2.0f * 255.0f);
 }
 
-//========================================================================
-// The purpose of this routine is to read a filename from the user.
-// Ideally this comes up as one of those touchy feely windows windows.
-//    hWnd -- The handle of our main window (or NULL)
-//    filename -- the place to put the filename
-//========================================================================
-bool
-GetOpenFileName(const char* caption, const char* filter, char* filename)
-{
-    HWND hWnd = NULL;
-    OPENFILENAME ofn; // common dialog box structure
-
-    // Initialize OPENFILENAME
-    ZeroMemory(&ofn, sizeof(OPENFILENAME));
-    ofn.lStructSize = sizeof(OPENFILENAME);
-    ofn.hwndOwner = hWnd;
-    ofn.lpstrFile = filename;
-    ofn.nMaxFile = _MAX_PATH;
-    ;
-    ofn.lpstrFilter = filter;
-    ofn.nFilterIndex = 1;
-    ofn.lpstrFileTitle = NULL;
-    ofn.nMaxFileTitle = 0;
-    ofn.lpstrInitialDir = NULL;
-    ofn.lpstrFileTitle = (char*)caption;
-    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-
-    // Display the Open dialog box.
-    return GetOpenFileName(&ofn);
-}
-
 int WINAPI
 WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow)
 {
@@ -121,48 +92,47 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCm
         // Put filename in here
         if ((finput = fopen(inFilename, "rb")) == NULL) {
             sprintf(buff, "Unable to open input TGA file: %s", inFilename);
-            MessageBox(NULL, buff, "Error", MB_OK | MB_ICONERROR);
+            MessageBox(buff, "Error", MB_OK | MB_ICONERROR);
             continue;
         }
 
         // Open output file
         if ((foutput = fopen(outFilename, "wb")) == NULL) {
             sprintf(buff, "Unable to open output TGA file: %s", inFilename);
-            MessageBox(NULL, buff, "Error", MB_OK | MB_ICONERROR);
+            MessageBox(buff, "Error", MB_OK | MB_ICONERROR);
             continue;
         }
 
         // Read TARGA header.
         if ((bytesRead = fread(&TGAHeader, sizeof(unsigned char), sizeof(TGAHeader), finput)) !=
             sizeof(TGAHeader)) {
-            MessageBox(NULL, "Bad Targa header", "Error", MB_OK | MB_ICONERROR);
+            MessageBox("Bad Targa header", "Error", MB_OK | MB_ICONERROR);
             continue;
         }
 
         // Write to output file TARGA header
         if ((bytesRead = fwrite(&TGAHeader, sizeof(unsigned char), sizeof(TGAHeader), foutput)) !=
             sizeof(TGAHeader)) {
-            MessageBox(NULL, "Bad Targa header writing out", "Error", MB_OK | MB_ICONERROR);
+            MessageBox("Bad Targa header writing out", "Error", MB_OK | MB_ICONERROR);
             continue;
         }
 
         descBytes = (unsigned char*)malloc(sizeof(unsigned char) * TGAHeader.idlen);
         if (descBytes == NULL) {
-            MessageBox(NULL, "Unable to allocate enough memory.", "Error", MB_OK | MB_ICONERROR);
+            MessageBox("Unable to allocate enough memory.", "Error", MB_OK | MB_ICONERROR);
             continue;
         }
 
         // Steal descriptive bytes at end of header
         if ((bytesRead = fread(descBytes, sizeof(unsigned char), TGAHeader.idlen, finput)) !=
             TGAHeader.idlen) {
-            MessageBox(NULL, "Couldn't seek past Targa header", "Error", MB_OK | MB_ICONERROR);
+            MessageBox("Couldn't seek past Targa header", "Error", MB_OK | MB_ICONERROR);
             continue;
         }
 
         if ((bytesRead = fwrite(descBytes, sizeof(unsigned char), TGAHeader.idlen, foutput)) !=
             TGAHeader.idlen) {
-            MessageBox(
-              NULL, "Bad Targa descriptive data writing out", "Error", MB_OK | MB_ICONERROR);
+            MessageBox("Bad Targa descriptive data writing out", "Error", MB_OK | MB_ICONERROR);
             continue;
         }
 
@@ -174,7 +144,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCm
         dstImage = (pixel*)malloc(sizeof(pixel) * gHeight * gWidth);
 
         if ((srcImage == NULL) || (dstImage == NULL)) {
-            MessageBox(NULL, "Unable to allocate enough memory.", "Error", MB_OK | MB_ICONERROR);
+            MessageBox("Unable to allocate enough memory.", "Error", MB_OK | MB_ICONERROR);
             continue;
         }
 
@@ -273,7 +243,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCm
         fclose(foutput); // close the output file
 
         sprintf(buff, "Success! New TGA file: %s", outFilename);
-        MessageBox(NULL, buff, "Success", MB_OK);
+        MessageBox(buff, "Success", MB_OK);
     }
     return (0);
 }
