@@ -10,6 +10,7 @@
 #define __NMFILEIO__H
 
 #include <stdio.h>
+#include <Types.h>
 
 #pragma pack (push)
 #pragma pack (1)   //dont pad the following struct
@@ -18,13 +19,10 @@
 #define NMF_HEADER_TAG "NMF "
 #define NMF_TRIANGLE_TAG "TRIS"
 
-// Redefine this to be a 4 byte unsigned integer for your compiler.
-typedef unsigned long UNSIGNED_INT_32;
-
 typedef struct 
 {
    char hdr[4];
-   UNSIGNED_INT_32 size;
+   int32 size;
 } NmHeader;
 
 typedef union
