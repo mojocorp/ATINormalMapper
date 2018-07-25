@@ -79,7 +79,7 @@ install(TARGETS NMFView DESTINATION bin)
 install(TARGETS NormalMapCombiner DESTINATION bin)
 install(TARGETS NormalMapper DESTINATION bin)
 install(TARGETS WorldSpaceifier DESTINATION bin)
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/data DESTINATION bin)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/data/ DESTINATION data)
 
 # Package builder
 set(CPACK_GENERATOR "ZIP")
