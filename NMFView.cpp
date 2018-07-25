@@ -86,7 +86,7 @@ AtiBitmap gTexInfo = { 0, 0, 0, ATI_BITMAP_FORMAT_UNKNOWN, NULL };
 bool gHaveTexture = false;
 GLuint gTextureID = 0;
 
-#ifndef ATI_MAC_OS
+#ifdef WIN32
 ///////////////////////////////////////////////////////////////////////////////
 // The purpose of this routine is to read a TGA filename from the user.
 // Ideally this comes up as one of those touchy feely Windows windows.
@@ -94,8 +94,9 @@ GLuint gTextureID = 0;
 //    filename -- the place to put the filename
 ///////////////////////////////////////////////////////////////////////////////
 BOOL
-GetTextureFileName(HWND hWnd, char* filename)
+GetTextureFileName(char* filename)
 {
+    HWND hWnd = NULL;
     OPENFILENAME ofn; // common dialog box structure
 
     // Initialize OPENFILENAME
@@ -124,8 +125,9 @@ GetTextureFileName(HWND hWnd, char* filename)
 //    filename -- the place to put the filename
 ///////////////////////////////////////////////////////////////////////////////
 BOOL
-GetNMFFileName(HWND hWnd, char* filename)
+GetNMFFileName(char* filename)
 {
+    HWND hWnd = NULL;
     OPENFILENAME ofn; // common dialog box structure
 
     // Initialize OPENFILENAME
@@ -153,7 +155,7 @@ GetNMFFileName(HWND hWnd, char* filename)
 }
 #else
 BOOL
-GetTextureFileName(int* dummy, char* filename)
+GetTextureFileName(char* filename)
 {
     // dialog options
     NavDialogOptions dialogOptions;
@@ -193,7 +195,7 @@ GetTextureFileName(int* dummy, char* filename)
 }
 
 BOOL
-GetNMFFileName(int* dummy, char* filename)
+GetNMFFileName(char* filename)
 {
     // dialog options
     NavDialogOptions dialogOptions;
@@ -520,7 +522,7 @@ LoadNewObjectAndMap()
     while (!done) {
         char filename[1024];
         filename[0] = '\0';
-        if (GetNMFFileName(NULL, filename)) {
+        if (GetNMFFileName(filename)) {
             if (LoadObjectFile(filename)) {
                 done = true;
             }
@@ -532,7 +534,7 @@ LoadNewObjectAndMap()
     while (!done) {
         char filename[1024];
         filename[0] = '\0';
-        if (GetTextureFileName(NULL, filename)) {
+        if (GetTextureFileName(filename)) {
             if (LoadTextureFile(filename)) {
                 done = true;
             }
@@ -1472,7 +1474,7 @@ main(int argc, char** argv)
             while (!done) {
                 char filename[1024];
                 filename[0] = '\0';
-                if (GetNMFFileName(NULL, filename)) {
+                if (GetNMFFileName(filename)) {
                     if (LoadObjectFile(filename)) {
                         done = true;
                     }
@@ -1484,7 +1486,7 @@ main(int argc, char** argv)
             while (!done) {
                 char filename[1024];
                 filename[0] = '\0';
-                if (GetTextureFileName(NULL, filename)) {
+                if (GetTextureFileName(filename)) {
                     if (LoadTextureFile(filename)) {
                         done = true;
                     }
