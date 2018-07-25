@@ -1,12 +1,12 @@
 /**********************************************************************
  *<
-	FILE: MAXExportNMF.h
+        FILE: MAXExportNMF.h
 
-	DESCRIPTION:	Template Utility
+        DESCRIPTION:	Template Utility
 
-	CREATED BY:
+        CREATED BY:
 
-	HISTORY:
+        HISTORY:
 
  *>	Copyright (c) 1997, All Rights Reserved.
  **********************************************************************/
@@ -15,15 +15,16 @@
 #define __MAXEXPORTNMF__H
 
 #include "Max.h"
-#include "resource.h"
-#include "istdplug.h"
 #include "iparamb2.h"
 #include "iparamm2.h"
+#include "istdplug.h"
+#include "resource.h"
 
-#include <direct.h>
 #include <commdlg.h>
+#include <direct.h>
 
-extern TCHAR *GetString(int id);
+extern TCHAR*
+GetString(int id);
 
 extern HINSTANCE hInstance;
 
