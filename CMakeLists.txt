@@ -16,6 +16,12 @@ ExternalProject_Add(freeglut
 include_directories(${CMAKE_BINARY_DIR}/freeglut/include)
 link_directories(${CMAKE_BINARY_DIR}/freeglut/lib)
 
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    add_definitions(-D_DEBUG)
+else()
+    add_definitions(-DNDEBUG)
+endif()
+
 set(SOURCES
     NMFConvert.cpp
     NmFileIO.cpp
