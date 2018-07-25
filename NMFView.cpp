@@ -91,8 +91,8 @@ GLuint gTextureID = 0;
 //    hWnd -- The handle of our main window (or NULL)
 //    filename -- the place to put the filename
 ///////////////////////////////////////////////////////////////////////////////
-BOOL
-GetTextureFileName(char* filename)
+bool
+GetOpenFileName(const char* caption, const char* filter, char* filename)
 {
     HWND hWnd = NULL;
     OPENFILENAME ofn; // common dialog box structure
@@ -104,129 +104,26 @@ GetTextureFileName(char* filename)
     ofn.lpstrFile = filename;
     ofn.nMaxFile = _MAX_PATH;
     ;
-    ofn.lpstrFilter = "Targa(*.TGA)\0*.TGA\0All(*.*)\0*.*\0";
+    ofn.lpstrFilter = filter;
     ofn.nFilterIndex = 1;
     ofn.lpstrFileTitle = NULL;
     ofn.nMaxFileTitle = 0;
     ofn.lpstrInitialDir = NULL;
-    ofn.lpstrFileTitle = "NMFView Open Texture File";
+    ofn.lpstrFileTitle = (char*)caption;
     ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
     // Display the Open dialog box.
     return GetOpenFileName(&ofn);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// The purpose of this routine is to read a NMF filename from the user.
-// Ideally this comes up as one of those touchy feely windows windows.
-//    hWnd -- The handle of our main window (or NULL)
-//    filename -- the place to put the filename
-///////////////////////////////////////////////////////////////////////////////
-BOOL
-GetNMFFileName(char* filename)
-{
-    HWND hWnd = NULL;
-    OPENFILENAME ofn; // common dialog box structure
-
-    // Initialize OPENFILENAME
-    ZeroMemory(&ofn, sizeof(OPENFILENAME));
-    ofn.lStructSize = sizeof(OPENFILENAME);
-    ofn.hwndOwner = hWnd;
-    ofn.lpstrFile = filename;
-    ofn.nMaxFile = _MAX_PATH;
-    ;
-    ofn.lpstrFileTitle = "NMFView Open NMF File";
-    ofn.lpstrFilter = "NMF(*.NMF)\0*.NMF\0All(*.*)\0*.*\0";
-    ofn.nFilterIndex = 1;
-    ofn.lpstrFileTitle = NULL;
-    ofn.nMaxFileTitle = 0;
-    ofn.lpstrInitialDir = NULL;
-    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-
-    // Display the Open dialog box.
-    return GetOpenFileName(&ofn);
-}
 #else
-BOOL
-GetTextureFileName(char* filename)
+bool
+GetOpenFileName(const char* title, const char* filter, char* filename)
 {
-    // dialog options
-    NavDialogOptions dialogOptions;
-    NavGetDefaultDialogOptions(&dialogOptions);
-    PLstrcpy(dialogOptions.windowTitle, "\pSelect Normal Map Texture (.tga)");
-
-    // AEDesc location;
-    FSRef fsr;
-    AEKeyword key;
-    DescType type;
-    Size size;
-    NavReplyRecord output;
-    NavTypeListHandle typeList =
-      (NavTypeListHandle)NewHandleClear(sizeof(NavTypeList) + sizeof(OSType) * 1);
-    (**typeList).osTypeCount = 1;
-    (**typeList).componentSignature = kNavGenericSignature;
-    (**typeList).osType[0] = '????';
-
-    NavChooseFile(NULL, &output, &dialogOptions, NULL, NULL, NULL, /*typeList*/ NULL, NULL);
-    if (output.validRecord) {
-        AEGetNthPtr(&output.selection, 1, typeFSRef, &key, &type, &fsr, sizeof(fsr), &size);
-
-        // get the full file path
-        CFStringRef strRef = CFURLGetString(CFURLCreateFromFSRef(NULL, &fsr));
-        char* buffer = (char*)CFStringGetCStringPtr(strRef, 0);
-
-        if (buffer)
-            buffer += 16; // drop the 'file://localhost/' string
-
-        strcpy(filename, buffer);
-    } else {
-        printf("Error: Invalid or no file chosen.\n");
-        exit(-1);
-    }
-
-    return TRUE;
+    return true;
 }
 
-BOOL
-GetNMFFileName(char* filename)
-{
-    // dialog options
-    NavDialogOptions dialogOptions;
-    NavGetDefaultDialogOptions(&dialogOptions);
-    PLstrcpy(dialogOptions.windowTitle, "\pSelect NormalMapper Data File (.nmf)");
-
-    // AEDesc location;
-    FSRef fsr;
-    AEKeyword key;
-    DescType type;
-    Size size;
-    NavReplyRecord output;
-    NavTypeListHandle typeList =
-      (NavTypeListHandle)NewHandleClear(sizeof(NavTypeList) + sizeof(OSType) * 1);
-    (**typeList).osTypeCount = 1;
-    (**typeList).componentSignature = kNavGenericSignature;
-    (**typeList).osType[0] = '????';
-
-    NavChooseFile(NULL, &output, &dialogOptions, NULL, NULL, NULL, /*typeList*/ NULL, NULL);
-    if (output.validRecord) {
-        AEGetNthPtr(&output.selection, 1, typeFSRef, &key, &type, &fsr, sizeof(fsr), &size);
-
-        // get the full file path
-        CFStringRef strRef = CFURLGetString(CFURLCreateFromFSRef(NULL, &fsr));
-        char* buffer = (char*)CFStringGetCStringPtr(strRef, 0);
-
-        if (buffer)
-            buffer += 16; // drop the 'file://localhost/' string
-
-        strcpy(filename, buffer);
-    } else {
-        printf("Error: Invalid or no file chosen.\n");
-        exit(-1);
-    }
-
-    return TRUE;
-}
-#endif // ATI_MAC_OS
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Set matrix to identity
@@ -509,7 +406,8 @@ LoadNewObjectAndMap()
     while (!done) {
         char filename[1024];
         filename[0] = '\0';
-        if (GetNMFFileName(filename)) {
+        if (GetOpenFileName(
+              "NMFView Open NMF File", "NMF(*.NMF)\0*.NMF\0All(*.*)\0*.*\0", filename)) {
             if (LoadObjectFile(filename)) {
                 done = true;
             }
@@ -521,7 +419,8 @@ LoadNewObjectAndMap()
     while (!done) {
         char filename[1024];
         filename[0] = '\0';
-        if (GetTextureFileName(filename)) {
+        if (GetOpenFileName(
+              "NMFView Open Texture File", "Targa(*.TGA)\0*.TGA\0All(*.*)\0*.*\0", filename)) {
             if (LoadTextureFile(filename)) {
                 done = true;
             }
@@ -1461,7 +1360,8 @@ main(int argc, char** argv)
             while (!done) {
                 char filename[1024];
                 filename[0] = '\0';
-                if (GetNMFFileName(filename)) {
+                if (GetOpenFileName(
+                      "NMFView Open NMF File", "NMF(*.NMF)\0*.NMF\0All(*.*)\0*.*\0", filename)) {
                     if (LoadObjectFile(filename)) {
                         done = true;
                     }
@@ -1473,7 +1373,9 @@ main(int argc, char** argv)
             while (!done) {
                 char filename[1024];
                 filename[0] = '\0';
-                if (GetTextureFileName(filename)) {
+                if (GetOpenFileName("NMFView Open Texture File",
+                                    "Targa(*.TGA)\0*.TGA\0All(*.*)\0*.*\0",
+                                    filename)) {
                     if (LoadTextureFile(filename)) {
                         done = true;
                     }

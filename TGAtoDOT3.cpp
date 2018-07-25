@@ -62,9 +62,10 @@ PackFloatInByte(float in)
 //    hWnd -- The handle of our main window (or NULL)
 //    filename -- the place to put the filename
 //========================================================================
-BOOL
-GetFileName(HWND hWnd, char* filename)
+bool
+GetOpenFileName(const char* caption, const char* filter, char* filename)
 {
+    HWND hWnd = NULL;
     OPENFILENAME ofn; // common dialog box structure
 
     // Initialize OPENFILENAME
@@ -74,12 +75,12 @@ GetFileName(HWND hWnd, char* filename)
     ofn.lpstrFile = filename;
     ofn.nMaxFile = _MAX_PATH;
     ;
-    ofn.lpstrFilter = "Targa(*.TGA)\0*.TGA\0All(*.*)\0*.*\0";
+    ofn.lpstrFilter = filter;
     ofn.nFilterIndex = 1;
     ofn.lpstrFileTitle = NULL;
     ofn.nMaxFileTitle = 0;
     ofn.lpstrInitialDir = NULL;
-    ofn.lpstrFileTitle = "TGAtoDOT3 Open File";
+    ofn.lpstrFileTitle = (char*)caption;
     ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
     // Display the Open dialog box.
@@ -105,7 +106,8 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCm
         char inFilename[_MAX_PATH];
         inFilename[0] = '\0';
         char outFilename[_MAX_PATH];
-        if (!GetFileName(NULL, inFilename)) {
+        if (!GetOpenFileName(
+              "TGAtoDOT3 Open File", "Targa(*.TGA)\0*.TGA\0All(*.*)\0*.*\0", inFilename)) {
             return 0;
         }
         strcpy(outFilename, inFilename);
