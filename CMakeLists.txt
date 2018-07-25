@@ -3,18 +3,32 @@ project (NormalMapper VERSION 3.2.2)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON) 
 
-include(ExternalProject)
-ExternalProject_Add(freeglut
-  GIT_REPOSITORY    https://github.com/dcnieho/FreeGLUT.git
-  GIT_TAG           FG_3_0_0
-  CMAKE_ARGS
-        -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-        -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/freeglut
-        -DFREEGLUT_BUILD_SHARED_LIBS=Off
-	    -DFREEGLUT_BUILD_STATIC_LIBS=On
-)
-include_directories(${CMAKE_BINARY_DIR}/freeglut/include)
-link_directories(${CMAKE_BINARY_DIR}/freeglut/lib)
+find_package(OpenGL REQUIRED)
+
+if (WIN32)
+    include(ExternalProject)
+    ExternalProject_Add(freeglut
+      GIT_REPOSITORY    https://github.com/dcnieho/FreeGLUT.git
+      GIT_TAG           FG_3_0_0
+      CMAKE_ARGS
+            -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+            -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/freeglut
+            -DFREEGLUT_BUILD_SHARED_LIBS=Off
+            -DFREEGLUT_BUILD_STATIC_LIBS=On
+            -DINSTALL_PDB=Off
+      UPDATE_COMMAND ""
+    )
+    include_directories(${CMAKE_BINARY_DIR}/freeglut/include)
+    link_directories(${CMAKE_BINARY_DIR}/freeglut/lib)
+
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
+        set(GLUT_LIBRARIES freeglut_staticd)
+    else()
+        set(GLUT_LIBRARIES freeglut_static)
+    endif()
+else ()
+    find_package(GLUT REQUIRED)
+endif (WIN32)
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     add_definitions(-D_DEBUG)
@@ -44,9 +58,11 @@ set(SOURCES
     TGAIO.cpp
 )
 add_executable(NMFView ${SOURCES})
-add_dependencies(NMFView freeglut)
-target_compile_definitions(NMFView PRIVATE FREEGLUT_LIB_PRAGMAS=0 FREEGLUT_STATIC=1)
-target_link_libraries (NMFView LINK_PUBLIC freeglut_static)
+if (WIN32)
+    add_dependencies(NMFView freeglut)
+    target_compile_definitions(NMFView PRIVATE FREEGLUT_LIB_PRAGMAS=0 FREEGLUT_STATIC=1)
+endif()
+target_link_libraries (NMFView LINK_PUBLIC ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
 
 set(SOURCES
     ArgFileIO.cpp
