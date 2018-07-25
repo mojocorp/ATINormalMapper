@@ -39,9 +39,18 @@ endif()
 set(SOURCES
     NMFConvert.cpp
     NmFileIO.cpp
+    TGAIO.cpp
+    ArgFileIO.cpp
+    SMDFileIO.cpp
+)
+add_library(Common STATIC ${SOURCES})
+
+set(SOURCES
+    NMFConvert.cpp
     NormalMapper.rc
 )
 add_executable(NMFConvert ${SOURCES})
+target_link_libraries (NMFConvert LINK_PUBLIC Common)
 
 # Maya plugin...
 #set(SOURCES
@@ -51,48 +60,38 @@ add_executable(NMFConvert ${SOURCES})
 #add_executable(NMFExport ${SOURCES})
 
 set(SOURCES
-    NmFileIO.cpp
     NMFView.cpp
     NMFView.rc
-    SMDFileIO.cpp
-    TGAIO.cpp
 )
 add_executable(NMFView ${SOURCES})
 if (WIN32)
     add_dependencies(NMFView freeglut)
     target_compile_definitions(NMFView PRIVATE FREEGLUT_LIB_PRAGMAS=0 FREEGLUT_STATIC=1)
 endif()
-target_link_libraries (NMFView LINK_PUBLIC ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
+target_link_libraries (NMFView LINK_PUBLIC Common ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
 
 set(SOURCES
-    ArgFileIO.cpp
     NormalMapCombiner.cpp
     NormalMapper.rc
-    TGAIO.cpp
 )
 add_executable(NormalMapCombiner ${SOURCES})
+target_link_libraries (NormalMapCombiner LINK_PUBLIC Common)
 
 set(SOURCES
-    ArgFileIO.cpp
     AtiOctree.cpp
     AtiTriBoxMoller.cpp
-    NmFileIO.cpp
     NormalMapper.cpp
     NormalMapper.rc
-    SMDFileIO.cpp
-    TGAIO.cpp
 )
 add_executable(NormalMapper ${SOURCES})
+target_link_libraries (NormalMapper LINK_PUBLIC Common)
 
 set(SOURCES
-    ArgFileIO.cpp
-    NmFileIO.cpp
-    SMDFileIO.cpp
-    TGAIO.cpp
     WorldSpaceifier.cpp
     NormalMapper.rc
 )
 add_executable(WorldSpaceifier ${SOURCES})
+target_link_libraries (WorldSpaceifier LINK_PUBLIC Common)
 
 set(SOURCES
     TGAtoDOT3.cpp
