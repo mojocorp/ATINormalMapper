@@ -24,9 +24,7 @@
 #include <float.h>
 #include <math.h>
 
-#ifdef WIN32
- #include <GL/glati.h>
-#endif
+#include <GL/glext.h>
 
 #include "NmFileIO.h"
 #include "TGAIO.h"
