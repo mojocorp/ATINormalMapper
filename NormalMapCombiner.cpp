@@ -24,8 +24,6 @@
 
 static char* versionString = "NormalMapCombiner v00.00.01\n";
 
-//#define USE_SMD_FILES
-
 #define PACKINTOBYTE_MINUS1TO1(X) ((uint8)((X)*127.5 + 127.5))
 #define UNPACKBYTE_MINUS1TO1(x) ((((float)(x)-127.5) / 127.5))
 #define PACKINTOBYTE_0TO1(x) ((uint8)((x)*255))

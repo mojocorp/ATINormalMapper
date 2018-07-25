@@ -41,7 +41,6 @@ set(SOURCES
     NmFileIO.cpp
     TGAIO.cpp
     ArgFileIO.cpp
-    SMDFileIO.cpp
 )
 add_library(Common STATIC ${SOURCES})
 

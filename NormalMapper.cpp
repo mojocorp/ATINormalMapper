@@ -25,8 +25,6 @@
 
 static char* versionString = "NormalMapper v03.02.02\n";
 
-//#define USE_SMD_FILES
-
 #define PACKINTOBYTE_MINUS1TO1(X) ((uint8)((X)*127.5 + 127.5))
 #define UNPACKBYTE_MINUS1TO1(x) ((((float)(x)-127.5) / 127.5))
 #define PACKINTOBYTE_0TO1(x) ((uint8)((x)*255))
@@ -1470,13 +1468,8 @@ ReadModel(char* name, char* type, int* numTris, NmRawTriangle** tris, double bbo
         NmPrint("ERROR: Unable to open %s\n", name);
         exit(-1);
     }
-#ifdef USE_SMD_FILES
-    extern bool SMDReadTriangles(FILE * fp, int* numTris, NmRawTriangle** tris);
-    if (SMDReadTriangles(fp, numTris, tris) == false)
-#else
-    if (NmReadTriangles(fp, numTris, tris) == false)
-#endif
-    {
+
+    if (NmReadTriangles(fp, numTris, tris) == false) {
         NmPrint("ERROR: Unable to read %s\n", name);
         fclose(fp);
         exit(-1);

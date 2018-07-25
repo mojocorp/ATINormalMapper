@@ -27,8 +27,6 @@
 #include "NmFileIO.h"
 #include "TGAIO.h"
 
-//#define USE_SMD_FILES
-
 // Light parameters
 GLfloat gLightpos[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
@@ -137,13 +135,8 @@ GetNMFFileName(char* filename)
     ofn.lpstrFile = filename;
     ofn.nMaxFile = _MAX_PATH;
     ;
-#ifdef USE_SMD_FILES
-    ofn.lpstrFileTitle = "NMFView Open SMD File";
-    ofn.lpstrFilter = "SMD(*.SMD)\0*.SMD\0All(*.*)\0*.*\0";
-#else
     ofn.lpstrFileTitle = "NMFView Open NMF File";
     ofn.lpstrFilter = "NMF(*.NMF)\0*.NMF\0All(*.*)\0*.*\0";
-#endif
     ofn.nFilterIndex = 1;
     ofn.lpstrFileTitle = NULL;
     ofn.nMaxFileTitle = 0;
@@ -359,13 +352,7 @@ LoadObjectFile(char* objectFile)
         printf("ERROR: Unable to open file: %s\n", objectFile);
         return false;
     }
-#ifdef USE_SMD_FILES
-    extern bool SMDReadTriangles(FILE * fp, int* numTris, NmRawTriangle** tris);
-    if (!SMDReadTriangles(fp, &gNumTris, &gTriangles))
-#else
-    if (!NmReadTriangles(fp, &gNumTris, &gTriangles))
-#endif
-    {
+    if (!NmReadTriangles(fp, &gNumTris, &gTriangles)) {
         printf("ERROR: Unable to read file: %s\n", objectFile);
         gNumTris = 0;
         delete[] gTriangles;
