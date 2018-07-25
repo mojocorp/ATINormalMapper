@@ -7,7 +7,7 @@
 // (C) 2002 ATI Research, Inc., All rights reserved.
 //=============================================================================
 
-#ifndef ATI_MAC_OS
+#ifdef WIN32
  #include <windows.h>
 #endif
 #include <stdio.h>

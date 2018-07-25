@@ -24,7 +24,7 @@
 #include <float.h>
 #include <math.h>
 
-#ifndef ATI_MAC_OS
+#ifdef WIN32
  #include <GL/glati.h>
 #endif
 
