@@ -94,6 +94,12 @@ set(SOURCES
 )
 add_executable(WorldSpaceifier ${SOURCES})
 
+set(SOURCES
+    TGAtoDOT3.cpp
+    NormalMapper.rc
+)
+add_executable(TGAtoDOT3 WIN32 ${SOURCES})
+
 # Install
 install(TARGETS NMFConvert DESTINATION bin)
 #install(TARGETS NMFExport DESTINATION bin)
@@ -101,6 +107,7 @@ install(TARGETS NMFView DESTINATION bin)
 install(TARGETS NormalMapCombiner DESTINATION bin)
 install(TARGETS NormalMapper DESTINATION bin)
 install(TARGETS WorldSpaceifier DESTINATION bin)
+install(TARGETS TGAtoDOT3 DESTINATION bin)
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/data/ DESTINATION data)
 
 # Package builder
