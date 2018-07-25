@@ -32,9 +32,6 @@
 #include "TGAIO.h"
 #include "ArgFileIO.h"
 
-// Limit the scope of the for statement
-#define for if(0) ; else for
-
 //#define USE_SMD_FILES
 
 // Light parameters
