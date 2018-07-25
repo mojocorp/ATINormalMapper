@@ -45,6 +45,7 @@ target_link_libraries (NMFView LINK_PUBLIC freeglut_static)
 set(SOURCES
     ArgFileIO.cpp
     NormalMapCombiner.cpp
+    NormalMapper.rc
     TGAIO.cpp
 )
 add_executable(NormalMapCombiner ${SOURCES})
