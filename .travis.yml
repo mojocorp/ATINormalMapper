@@ -1,0 +1,29 @@
+language: cpp
+
+branches:
+  only:
+    - master
+
+matrix:
+  include:
+  - compiler: gcc
+    os: linux
+    dist: trusty
+  - compiler: clang
+    os: osx
+    env: MACOSX_DEPLOYMENT_TARGET=10.11
+
+before_install:
+ - transfer() { curl --progress-bar --upload-file "$1" "https://transfer.sh/$1"; }
+
+install:
+ - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install freeglut3-dev; fi
+
+script:
+- mkdir -p build
+- cd build
+- cmake -DCMAKE_INSTALL_PREFIX=installed ..
+- cmake --build . --config Release --target package
+- transfer NormalMapper*.zip
+
+
