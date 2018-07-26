@@ -26,6 +26,7 @@
 #include "ArgFileIO.h"
 #include "NmFileIO.h"
 #include "TGAIO.h"
+#include "NativeDialogs.h"
 
 // Light parameters
 GLfloat gLightpos[] = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -83,47 +84,6 @@ double* gLightVec = NULL;
 AtiBitmap gTexInfo = { 0, 0, 0, ATI_BITMAP_FORMAT_UNKNOWN, NULL };
 bool gHaveTexture = false;
 GLuint gTextureID = 0;
-
-#ifdef WIN32
-///////////////////////////////////////////////////////////////////////////////
-// The purpose of this routine is to read a TGA filename from the user.
-// Ideally this comes up as one of those touchy feely Windows windows.
-//    hWnd -- The handle of our main window (or NULL)
-//    filename -- the place to put the filename
-///////////////////////////////////////////////////////////////////////////////
-bool
-GetOpenFileName(const char* caption, const char* filter, char* filename)
-{
-    HWND hWnd = NULL;
-    OPENFILENAME ofn; // common dialog box structure
-
-    // Initialize OPENFILENAME
-    ZeroMemory(&ofn, sizeof(OPENFILENAME));
-    ofn.lStructSize = sizeof(OPENFILENAME);
-    ofn.hwndOwner = hWnd;
-    ofn.lpstrFile = filename;
-    ofn.nMaxFile = _MAX_PATH;
-    ;
-    ofn.lpstrFilter = filter;
-    ofn.nFilterIndex = 1;
-    ofn.lpstrFileTitle = NULL;
-    ofn.nMaxFileTitle = 0;
-    ofn.lpstrInitialDir = NULL;
-    ofn.lpstrFileTitle = (char*)caption;
-    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-
-    // Display the Open dialog box.
-    return GetOpenFileName(&ofn);
-}
-
-#else
-bool
-GetOpenFileName(const char* title, const char* filter, char* filename)
-{
-    return true;
-}
-
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Set matrix to identity

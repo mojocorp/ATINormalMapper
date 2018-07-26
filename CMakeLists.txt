@@ -41,6 +41,7 @@ set(SOURCES
     NmFileIO.cpp
     TGAIO.cpp
     ArgFileIO.cpp
+    NativeDialogs.cpp
 )
 add_library(Common STATIC ${SOURCES})
 
@@ -97,6 +98,7 @@ set(SOURCES
     NormalMapper.rc
 )
 add_executable(TGAtoDOT3 WIN32 ${SOURCES})
+target_link_libraries (TGAtoDOT3 LINK_PUBLIC Common)
 
 # Install
 install(TARGETS NMFConvert DESTINATION bin)
