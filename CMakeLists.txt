@@ -52,6 +52,11 @@ set(SOURCES
 add_executable(NMFConvert ${SOURCES})
 target_link_libraries (NMFConvert LINK_PUBLIC Common)
 
+if (APPLE)
+    set_source_files_properties(NativeDialogs.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework Cocoa")
+endif()
+
 # Maya plugin...
 #set(SOURCES
 #    NmFileIO.cpp
