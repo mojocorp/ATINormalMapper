@@ -36,14 +36,20 @@ else()
     add_definitions(-DNDEBUG)
 endif()
 
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework cocoa")
+
 set(SOURCES
     NMFConvert.cpp
     NmFileIO.cpp
     TGAIO.cpp
     ArgFileIO.cpp
-    FileDialog_win.cpp
+    NativeDialogs.cpp
 )
 add_library(Common STATIC ${SOURCES})
+
+if (APPLE)
+    set_source_files_properties(NativeDialogs.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
+endif()
 
 set(SOURCES
     NMFConvert.cpp
@@ -95,7 +101,6 @@ target_link_libraries (WorldSpaceifier LINK_PUBLIC Common)
 
 set(SOURCES
     TGAtoDOT3.cpp
-    MessageBox_win.cpp
     NormalMapper.rc
 )
 add_executable(TGAtoDOT3 WIN32 ${SOURCES})
