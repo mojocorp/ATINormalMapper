@@ -11,15 +11,18 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+#define usleep(n) Sleep(n)
 #else
 #include <GLUT/glut.h>
 #include <OpenGL/gl.h>
 #include <OpenGL/glext.h>
 #include <string.h>
+#include <unistd.h>
 #endif
 #include <float.h>
 #include <math.h>
 #include <stdio.h>
+#include <cstdlib>
 
 #include <GL/glext.h>
 
@@ -473,7 +476,7 @@ ObjectInit(void)
     // Make sure we have verts.
     if (gNumVerts < 1) {
         printf("ERROR: No vertices!\n");
-        Sleep(5000);
+        usleep(5000);
         exit(-1);
     }
 
@@ -485,7 +488,7 @@ ObjectInit(void)
     gLightVec = new double[gNumVerts * 3];
     if (gLightVec == NULL) {
         printf("ERROR: Unable to allocate light vector array!\n");
-        Sleep(5000);
+        usleep(5000);
         exit(-1);
     }
     memset(gLightVec, 0, sizeof(double) * gNumVerts * 3);
@@ -529,7 +532,7 @@ TextureInit()
             break;
         default:
             printf("ERROR: Unhandled texture type!\n");
-            Sleep(5000);
+            usleep(5000);
             exit(-1);
     }
 }
@@ -1274,7 +1277,7 @@ checkExtensions(void)
 #endif
     {
         printf("No GL_EXT_texture_env_combine support!\n");
-        Sleep(5000);
+        usleep(5000);
         exit(-1);
     }
 #ifdef WIN32
@@ -1284,7 +1287,7 @@ checkExtensions(void)
 #endif
     {
         printf("No GL_EXT_texture_env_dot3 support!\n");
-        Sleep(5000);
+        usleep(5000);
         exit(-1);
     }
 }

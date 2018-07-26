@@ -1,41 +1,16 @@
 // This program converts a height map into a Normal map for bumpmapping.
 // It assumes the height field is in the red channel of a 24 or 32 bit
 // targa image.
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 #include <math.h>
 #include <stdio.h>
-#include <windows.h>
+#include <cstdlib>
+#include <cstring>
 #include <NativeDialogs.h>
-
-// Targa header info
-#pragma pack(push)
-#pragma pack(1) // dont pad the following struct
-
-typedef struct _TGAHeaderInfo
-{
-    BYTE idlen;    // length of optional identification sequence
-    BYTE cmtype;   // indicates whether a palette is present
-    BYTE imtype;   // image data type (e.g., uncompressed RGB)
-    WORD cmorg;    // first palette index, if present
-    WORD cmcnt;    // number of palette entries, if present
-    BYTE cmsize;   // number of bits per palette entry
-    WORD imxorg;   // horiz pixel coordinate of lower left of image
-    WORD imyorg;   // vert pixel coordinate of lower left of image
-    WORD imwidth;  // image width in pixels
-    WORD imheight; // image height in pixels
-    BYTE imdepth;  // image color depth (bits per pixel)
-    BYTE imdesc;   // image attribute flags
-} TGAHeaderInfo;
-
-#pragma pack(pop)
-
-typedef struct _pixel
-{
-    BYTE red;
-    BYTE blue;
-    BYTE green;
-    BYTE alpha;
-} pixel;
+#include <TGAIO.h>
 
 int gWidth, gHeight;
 
@@ -51,19 +26,24 @@ ReadPixel(pixel* image, pixel* pix, int x, int y)
     *pix = *(image + gWidth * y + x);
 }
 
-BYTE
+uint8
 PackFloatInByte(float in)
 {
-    return (BYTE)((in + 1.0f) / 2.0f * 255.0f);
+    return (uint8)((in + 1.0f) / 2.0f * 255.0f);
 }
 
+#ifdef _WIN32
 int WINAPI
 WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow)
+#else
+int
+main(int argc, char** argv)
+#endif
 {
-    char buff[256 + _MAX_PATH];
+    char buff[256 + 1024];
     TGAHeaderInfo TGAHeader;
     FILE *finput, *foutput;
-    DWORD bytesRead;
+    uint16 bytesRead;
     int x, y;
     unsigned char* descBytes;
     pixel pix, *srcImage, *dstImage;
@@ -73,9 +53,9 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCm
     while (TRUE) {
         // Either take the input and output filename from the command line
         // or grab it from the user.
-        char inFilename[_MAX_PATH];
+        char inFilename[1024];
         inFilename[0] = '\0';
-        char outFilename[_MAX_PATH];
+        char outFilename[1024];
         if (!GetOpenFileName(
               "TGAtoDOT3 Open File", "Targa(*.TGA)\0*.TGA\0All(*.*)\0*.*\0", inFilename)) {
             return 0;
@@ -149,12 +129,12 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCm
 
         for (y = 0; y < gHeight; y++) {
             for (x = 0; x < gWidth; x++) {
-                fread(&pix.blue, sizeof(BYTE), 1, finput);
-                fread(&pix.green, sizeof(BYTE), 1, finput);
-                fread(&pix.red, sizeof(BYTE), 1, finput);
+                fread(&pix.blue, sizeof(uint8), 1, finput);
+                fread(&pix.green, sizeof(uint8), 1, finput);
+                fread(&pix.red, sizeof(uint8), 1, finput);
 
                 if (TGAHeader.imdepth == 32)
-                    fread(&pix.alpha, sizeof(BYTE), 1, finput);
+                    fread(&pix.alpha, sizeof(uint8), 1, finput);
                 else
                     pix.alpha = 0xcc;
 
@@ -213,9 +193,9 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCm
                 nY *= oolen;
                 nZ *= oolen;
 
-                pix.red = (BYTE)PackFloatInByte(nX);
-                pix.green = (BYTE)PackFloatInByte(nY);
-                pix.blue = (BYTE)PackFloatInByte(nZ);
+                pix.red = (uint8)PackFloatInByte(nX);
+                pix.green = (uint8)PackFloatInByte(nY);
+                pix.blue = (uint8)PackFloatInByte(nZ);
 
                 WritePixel(dstImage, &pix, x, y);
             }
@@ -225,12 +205,12 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCm
             for (x = 0; x < gWidth; x++) {
                 ReadPixel(dstImage, &pix, x, y);
 
-                fwrite(&pix.blue, sizeof(BYTE), 1, foutput);
-                fwrite(&pix.green, sizeof(BYTE), 1, foutput);
-                fwrite(&pix.red, sizeof(BYTE), 1, foutput);
+                fwrite(&pix.blue, sizeof(uint8), 1, foutput);
+                fwrite(&pix.green, sizeof(uint8), 1, foutput);
+                fwrite(&pix.red, sizeof(uint8), 1, foutput);
 
                 if (TGAHeader.imdepth == 32)
-                    fwrite(&pix.alpha, sizeof(BYTE), 1, foutput);
+                    fwrite(&pix.alpha, sizeof(uint8), 1, foutput);
             }
         }
 
