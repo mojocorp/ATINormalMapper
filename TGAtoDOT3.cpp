@@ -56,8 +56,7 @@ main(int argc, char** argv)
         char inFilename[1024];
         inFilename[0] = '\0';
         char outFilename[1024];
-        if (!GetOpenFileName(
-              "TGAtoDOT3 Open File", "Targa(*.TGA)\0*.TGA\0All(*.*)\0*.*\0", inFilename)) {
+        if (!GetOpenFileName("TGAtoDOT3 Open File", "TGA\0*.TGA\0All\0*.*\0", inFilename)) {
             return 0;
         }
         strcpy(outFilename, inFilename);

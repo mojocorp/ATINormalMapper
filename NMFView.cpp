@@ -369,8 +369,7 @@ LoadNewObjectAndMap()
     while (!done) {
         char filename[1024];
         filename[0] = '\0';
-        if (GetOpenFileName(
-              "NMFView Open NMF File", "NMF(*.NMF)\0*.NMF\0All(*.*)\0*.*\0", filename)) {
+        if (GetOpenFileName("NMFView Open NMF File", "NMF\0*.NMF\0All\0*.*\0", filename)) {
             if (LoadObjectFile(filename)) {
                 done = true;
             }
@@ -382,8 +381,7 @@ LoadNewObjectAndMap()
     while (!done) {
         char filename[1024];
         filename[0] = '\0';
-        if (GetOpenFileName(
-              "NMFView Open Texture File", "Targa(*.TGA)\0*.TGA\0All(*.*)\0*.*\0", filename)) {
+        if (GetOpenFileName("NMFView Open Texture File", "TGA\0*.TGA\0All\0*.*\0", filename)) {
             if (LoadTextureFile(filename)) {
                 done = true;
             }
@@ -1323,8 +1321,7 @@ main(int argc, char** argv)
             while (!done) {
                 char filename[1024];
                 filename[0] = '\0';
-                if (GetOpenFileName(
-                      "NMFView Open NMF File", "NMF(*.NMF)\0*.NMF\0All(*.*)\0*.*\0", filename)) {
+                if (GetOpenFileName("NMFView Open NMF File", "NMF\0*.NMF\0All\0*.*\0", filename)) {
                     if (LoadObjectFile(filename)) {
                         done = true;
                     }
@@ -1336,9 +1333,8 @@ main(int argc, char** argv)
             while (!done) {
                 char filename[1024];
                 filename[0] = '\0';
-                if (GetOpenFileName("NMFView Open Texture File",
-                                    "Targa(*.TGA)\0*.TGA\0All(*.*)\0*.*\0",
-                                    filename)) {
+                if (GetOpenFileName(
+                      "NMFView Open Texture File", "TGA\0*.TGA\0All\0*.*\0", filename)) {
                     if (LoadTextureFile(filename)) {
                         done = true;
                     }
