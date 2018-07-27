@@ -75,6 +75,39 @@ MessageBox(const char* text, const char* caption, unsigned int uType)
     return returnCode == NSAlertFirstButtonReturn;
 }
 #else
-#error "Unsupported platform"
+// Assume Linux
+#include <gtk/gtk.h>
+
+static void
+initGTK()
+{
+    static bool initialized = false;
+    if (!initialized) {
+        int argc = 0;
+        char** argv = nullptr;
+        gtk_init(&argc, &argv);
+        initialized = true;
+    }
+}
+
+bool
+GetOpenFileName(const char* caption, const char* filter, char* filename)
+{
+    initGTK();
+    return true;
+}
+
+int
+MessageBox(const char* text, const char* caption, unsigned int uType)
+{
+    initGTK();
+
+    GtkWidget* dialog = gtk_message_dialog_new(
+      NULL, (GtkDialogFlags)0, GTK_MESSAGE_QUESTION, GTK_BUTTONS_OK_CANCEL, "%s", text);
+    gint response = gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+
+    return response == GTK_RESPONSE_OK;
+}
 #endif
 #endif
