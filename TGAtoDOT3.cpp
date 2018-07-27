@@ -15,15 +15,31 @@
 int gWidth, gHeight;
 
 void
-WritePixel(pixel* image, pixel* pix, int x, int y)
+WritePixel(uint8* image, int bpp, const pixel* pix, int x, int y)
 {
-    *(image + gWidth * y + x) = *pix;
+    const int idx = (x + y * gWidth) * (bpp / 8);
+    if (bpp >= 8) {
+        image[idx + 0] = pix->blue;
+    }
+    if (bpp >= 16) {
+        image[idx + 1] = pix->green;
+    }
+    if (bpp >= 24) {
+        image[idx + 2] = pix->red;
+    }
+    if (bpp >= 32) {
+        image[idx + 3] = pix->alpha;
+    }
 }
 
 void
-ReadPixel(pixel* image, pixel* pix, int x, int y)
+ReadPixel(const uint8* image, int bpp, pixel* pix, int x, int y)
 {
-    *pix = *(image + gWidth * y + x);
+    const int idx = (x + y * gWidth) * (bpp / 8);
+
+    pix->blue = image[idx + 0];
+    pix->green = image[idx + 1];
+    pix->red = image[idx + 2];
 }
 
 uint8
@@ -41,13 +57,9 @@ main(int argc, char** argv)
 #endif
 {
     char buff[256 + 1024];
-    TGAHeaderInfo TGAHeader;
     FILE *finput, *foutput;
-    uint16 bytesRead;
-    int x, y;
-    unsigned char* descBytes;
-    pixel pix, *srcImage, *dstImage;
-    float dX, dY, nX, nY, nZ, oolen;
+
+    pixel pix;
 
     // Loop until the user cancels the open dialog
     while (TRUE) {
@@ -74,120 +86,72 @@ main(int argc, char** argv)
             continue;
         }
 
-        // Open output file
-        if ((foutput = fopen(outFilename, "wb")) == NULL) {
-            sprintf(buff, "Unable to open output TGA file: %s", inFilename);
-            MessageBox(buff, "Error", NMB_OK | NMB_ICONERROR);
+        uint8* srcImage;
+        int bpp;
+        if (!TGAReadImage(finput, &gWidth, &gHeight, &bpp, &srcImage)) {
+            MessageBox("Unable to read image data", "Error", NMB_OK | NMB_ICONERROR);
+            fclose(finput);
             continue;
         }
-
-        // Read TARGA header.
-        if ((bytesRead = fread(&TGAHeader, sizeof(unsigned char), sizeof(TGAHeader), finput)) !=
-            sizeof(TGAHeader)) {
-            MessageBox("Bad Targa header", "Error", NMB_OK | NMB_ICONERROR);
-            continue;
-        }
-
-        // Write to output file TARGA header
-        if ((bytesRead = fwrite(&TGAHeader, sizeof(unsigned char), sizeof(TGAHeader), foutput)) !=
-            sizeof(TGAHeader)) {
-            MessageBox("Bad Targa header writing out", "Error", NMB_OK | NMB_ICONERROR);
-            continue;
-        }
-
-        descBytes = (unsigned char*)malloc(sizeof(unsigned char) * TGAHeader.idlen);
-        if (descBytes == NULL) {
-            MessageBox("Unable to allocate enough memory.", "Error", NMB_OK | NMB_ICONERROR);
-            continue;
-        }
-
-        // Steal descriptive bytes at end of header
-        if ((bytesRead = fread(descBytes, sizeof(unsigned char), TGAHeader.idlen, finput)) !=
-            TGAHeader.idlen) {
-            MessageBox("Couldn't seek past Targa header", "Error", NMB_OK | NMB_ICONERROR);
-            continue;
-        }
-
-        if ((bytesRead = fwrite(descBytes, sizeof(unsigned char), TGAHeader.idlen, foutput)) !=
-            TGAHeader.idlen) {
-            MessageBox("Bad Targa descriptive data writing out", "Error", NMB_OK | NMB_ICONERROR);
-            continue;
-        }
-
-        gWidth = TGAHeader.imwidth;
-        gHeight = TGAHeader.imheight;
+        fclose(finput); // close the input file
 
         // allocate storage
-        srcImage = (pixel*)malloc(sizeof(pixel) * gHeight * gWidth);
-        dstImage = (pixel*)malloc(sizeof(pixel) * gHeight * gWidth);
+        uint8* dstImage = (uint8*)malloc(gHeight * gWidth * (bpp / 8));
 
-        if ((srcImage == NULL) || (dstImage == NULL)) {
+        if (dstImage == NULL) {
             MessageBox("Unable to allocate enough memory.", "Error", NMB_OK | NMB_ICONERROR);
             continue;
         }
 
-        for (y = 0; y < gHeight; y++) {
-            for (x = 0; x < gWidth; x++) {
-                fread(&pix.blue, sizeof(uint8), 1, finput);
-                fread(&pix.green, sizeof(uint8), 1, finput);
-                fread(&pix.red, sizeof(uint8), 1, finput);
-
-                if (TGAHeader.imdepth == 32)
-                    fread(&pix.alpha, sizeof(uint8), 1, finput);
-                else
-                    pix.alpha = 0xcc;
-
-                WritePixel(srcImage, &pix, x, y);
-            }
-        }
-
-        for (y = 0; y < gHeight; y++) {
-            for (x = 0; x < gWidth; x++) {
+        for (int y = 0; y < gHeight; y++) {
+            for (int x = 0; x < gWidth; x++) {
                 // Do Y Sobel filter
-                ReadPixel(srcImage, &pix, (x - 1 + gWidth) % gWidth, (y + 1) % gHeight);
-                dY = ((float)pix.red) / 255.0f * -1.0f;
+                ReadPixel(srcImage, bpp, &pix, (x - 1 + gWidth) % gWidth, (y + 1) % gHeight);
+                float dY = ((float)pix.red) / 255.0f * -1.0f;
 
-                ReadPixel(srcImage, &pix, x % gWidth, (y + 1) % gHeight);
+                ReadPixel(srcImage, bpp, &pix, x % gWidth, (y + 1) % gHeight);
                 dY += ((float)pix.red) / 255.0f * -2.0f;
 
-                ReadPixel(srcImage, &pix, (x + 1) % gWidth, (y + 1) % gHeight);
+                ReadPixel(srcImage, bpp, &pix, (x + 1) % gWidth, (y + 1) % gHeight);
                 dY += ((float)pix.red) / 255.0f * -1.0f;
 
-                ReadPixel(srcImage, &pix, (x - 1 + gWidth) % gWidth, (y - 1 + gHeight) % gHeight);
+                ReadPixel(
+                  srcImage, bpp, &pix, (x - 1 + gWidth) % gWidth, (y - 1 + gHeight) % gHeight);
                 dY += ((float)pix.red) / 255.0f * 1.0f;
 
-                ReadPixel(srcImage, &pix, x % gWidth, (y - 1 + gHeight) % gHeight);
+                ReadPixel(srcImage, bpp, &pix, x % gWidth, (y - 1 + gHeight) % gHeight);
                 dY += ((float)pix.red) / 255.0f * 2.0f;
 
-                ReadPixel(srcImage, &pix, (x + 1) % gWidth, (y - 1 + gHeight) % gHeight);
+                ReadPixel(srcImage, bpp, &pix, (x + 1) % gWidth, (y - 1 + gHeight) % gHeight);
                 dY += ((float)pix.red) / 255.0f * 1.0f;
 
                 // Do X Sobel filter
-                ReadPixel(srcImage, &pix, (x - 1 + gWidth) % gWidth, (y - 1 + gHeight) % gHeight);
-                dX = ((float)pix.red) / 255.0f * -1.0f;
+                ReadPixel(
+                  srcImage, bpp, &pix, (x - 1 + gWidth) % gWidth, (y - 1 + gHeight) % gHeight);
+                float dX = ((float)pix.red) / 255.0f * -1.0f;
 
-                ReadPixel(srcImage, &pix, (x - 1 + gWidth) % gWidth, y % gHeight);
+                ReadPixel(srcImage, bpp, &pix, (x - 1 + gWidth) % gWidth, y % gHeight);
                 dX += ((float)pix.red) / 255.0f * -2.0f;
 
-                ReadPixel(srcImage, &pix, (x - 1 + gWidth) % gWidth, (y + 1) % gHeight);
+                ReadPixel(srcImage, bpp, &pix, (x - 1 + gWidth) % gWidth, (y + 1) % gHeight);
                 dX += ((float)pix.red) / 255.0f * -1.0f;
 
-                ReadPixel(srcImage, &pix, (x + 1) % gWidth, (y - 1 + gHeight) % gHeight);
+                ReadPixel(srcImage, bpp, &pix, (x + 1) % gWidth, (y - 1 + gHeight) % gHeight);
                 dX += ((float)pix.red) / 255.0f * 1.0f;
 
-                ReadPixel(srcImage, &pix, (x + 1) % gWidth, y % gHeight);
+                ReadPixel(srcImage, bpp, &pix, (x + 1) % gWidth, y % gHeight);
                 dX += ((float)pix.red) / 255.0f * 2.0f;
 
-                ReadPixel(srcImage, &pix, (x + 1) % gWidth, (y + 1) % gHeight);
+                ReadPixel(srcImage, bpp, &pix, (x + 1) % gWidth, (y + 1) % gHeight);
                 dX += ((float)pix.red) / 255.0f * 1.0f;
 
                 // Cross Product of components of gradient reduces to
-                nX = -dX;
-                nY = -dY;
-                nZ = 1;
+                float nX = -dX;
+                float nY = -dY;
+                float nZ = 1;
 
                 // Normalize
-                oolen = 1.0f / ((float)sqrt(nX * nX + nY * nY + nZ * nZ));
+                float oolen = 1.0f / ((float)sqrt(nX * nX + nY * nY + nZ * nZ));
                 nX *= oolen;
                 nY *= oolen;
                 nZ *= oolen;
@@ -196,29 +160,26 @@ main(int argc, char** argv)
                 pix.green = (uint8)PackFloatInByte(nY);
                 pix.blue = (uint8)PackFloatInByte(nZ);
 
-                WritePixel(dstImage, &pix, x, y);
+                WritePixel(dstImage, bpp, &pix, x, y);
             }
         }
 
-        for (y = 0; y < gHeight; y++) {
-            for (x = 0; x < gWidth; x++) {
-                ReadPixel(dstImage, &pix, x, y);
-
-                fwrite(&pix.blue, sizeof(uint8), 1, foutput);
-                fwrite(&pix.green, sizeof(uint8), 1, foutput);
-                fwrite(&pix.red, sizeof(uint8), 1, foutput);
-
-                if (TGAHeader.imdepth == 32)
-                    fwrite(&pix.alpha, sizeof(uint8), 1, foutput);
-            }
+        // Open output file
+        if ((foutput = fopen(outFilename, "wb")) == NULL) {
+            sprintf(buff, "Unable to open output TGA file: %s", inFilename);
+            MessageBox(buff, "Error", NMB_OK | NMB_ICONERROR);
+            continue;
         }
+
+        if (!TGAWriteImage(foutput, gWidth, gHeight, bpp, dstImage, true)) {
+            MessageBox("Unable to write output file", "Error", NMB_OK | NMB_ICONERROR);
+            fclose(foutput);
+            continue;
+        }
+        fclose(foutput); // close the output file
 
         free(srcImage);
         free(dstImage);
-        free(descBytes);
-
-        fclose(finput);  // close the input file
-        fclose(foutput); // close the output file
 
         sprintf(buff, "Success! New TGA file: %s", outFilename);
         MessageBox(buff, "Success", NMB_OK);
