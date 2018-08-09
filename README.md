@@ -6,22 +6,21 @@
 The purpose of the NormalMapper is to generate normal (bump) maps from
 a high and low resolution model.  The key files are:
 
-NormalMapper.exe - Utility to generate normal maps.
-Mac\NormalMapperMac - Mac version of the utility to generate normal maps
-NMFView.exe - OpenGL NMF file and normal map viewer
-Mac\NMFViewMac.app - Mac version of the NMF viewer.
-WorldSpacifier.exe - Utility to transform tangent space maps to world space.
+NormalMapper - Utility to generate normal maps.
+NMFView - OpenGL NMF file and normal map viewer
+WorldSpacifier - Utility to transform tangent space maps to world space.
+NMFConvert - Converter to change older NMF files into new NMF files.
+NormalMap.ppt - Power Point Slides from Alex Vlachos' ATI Mojo Day talk.
+data/CarLow.nmf - Sample low resolution model
+data/CarHigh.nmf - Sample high resolution model
+data/CarNormals.tga - Sample normal map.
+
 NMFExport.mll - Maya 4.0 exporter
 Maya45NMFExport.mll - Maya 4.5 exporter
 Maya50NMFExport.mll - Maya 5.0 exporter
 MAXExportNMF.dle - 3DSMAX 3.1 exporter
 MAX4ExportNMF.dle - 3DSMAX 4.0 exporter
 MAX5ExportNMF.dle - 3DSMAX 5.0 exporter
-NMFConvert.exe - Converter to change older NMF files into new NMF files.
-NormalMap.ppt - Power Point Slides from Alex Vlachos' ATI Mojo Day talk.
-CarLow.nmf - Sample low resolution model
-CarHigh.nmf - Sample high resolution model
-CarNormals.tga - Sample normal map.
 
 ------------------------------------------------------------------------------
 
