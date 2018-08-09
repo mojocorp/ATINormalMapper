@@ -114,6 +114,7 @@ install(TARGETS NormalMapper DESTINATION bin)
 install(TARGETS WorldSpaceifier DESTINATION bin)
 install(TARGETS TGAtoDOT3 DESTINATION bin)
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/data/ DESTINATION data)
+install(FILES ${CMAKE_SOURCE_DIR}/doc/NormalMap.ppt DESTINATION doc)
 
 # Package builder
 set(CPACK_GENERATOR "ZIP")

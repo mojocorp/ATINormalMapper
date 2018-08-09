@@ -6,11 +6,11 @@
 The purpose of the NormalMapper is to generate normal (bump) maps from
 a high and low resolution model.  The key files are:
 
-NormalMapper - Utility to generate normal maps.
-NMFView - OpenGL NMF file and normal map viewer
-WorldSpacifier - Utility to transform tangent space maps to world space.
-NMFConvert - Converter to change older NMF files into new NMF files.
-NormalMap.ppt - Power Point Slides from Alex Vlachos' ATI Mojo Day talk.
+bin/NormalMapper - Utility to generate normal maps.
+bin/NMFView - OpenGL NMF file and normal map viewer
+bin/WorldSpacifier - Utility to transform tangent space maps to world space.
+bin/NMFConvert - Converter to change older NMF files into new NMF files.
+doc/NormalMap.ppt - Power Point Slides from Alex Vlachos' ATI Mojo Day talk.
 data/CarLow.nmf - Sample low resolution model
 data/CarHigh.nmf - Sample high resolution model
 data/CarNormals.tga - Sample normal map.
