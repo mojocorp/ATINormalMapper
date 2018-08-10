@@ -13,7 +13,6 @@ build_script:
   - cd build
   - cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_INSTALL_PREFIX=installed ..
   - cmake --build . --config Release --target package
-  - ls -l Release
 
 artifacts: 
   - path: build\NormalMapper*.zip

@@ -9,7 +9,7 @@
 #include <cstdlib>
 #include <stdio.h>
 
-#include "NmFileIO.h"
+#include <NmFileIO.h>
 
 //////////////////////////////////////////////////////////////////////////
 // Entry point
