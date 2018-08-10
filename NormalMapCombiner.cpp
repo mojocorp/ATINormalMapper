@@ -37,15 +37,6 @@ static char* versionString = "NormalMapCombiner v00.00.01\n";
 #define PACKINTOSHORT_SMINUS1TO1(x) ((short)((x)*32767.5))
 #define UNPACKSHORT_SMINUS1TO1(x) (((float)(x)) / 32767.5)
 
-#define VEC_Subtract(a, b, c)                                                                      \
-    ((c)[0] = (a)[0] - (b)[0], (c)[1] = (a)[1] - (b)[1], (c)[2] = (a)[2] - (b)[2])
-#define VEC_Add(a, b, c)                                                                           \
-    ((c)[0] = (a)[0] + (b)[0], (c)[1] = (a)[1] + (b)[1], (c)[2] = (a)[2] + (b)[2])
-#define VEC_Cross(a, b, c)                                                                         \
-    ((c)[0] = (a)[1] * (b)[2] - (a)[2] * (b)[1],                                                   \
-     (c)[1] = (a)[2] * (b)[0] - (a)[0] * (b)[2],                                                   \
-     (c)[2] = (a)[0] * (b)[1] - (a)[1] * (b)[0])
-#define VEC_DotProduct(a, b) ((a)[0] * (b)[0] + (a)[1] * (b)[1] + (a)[2] * (b)[2])
 #define INT_ROUND_TEXCOORD_U(X) (int)(((X) * (float)(gWidth - 1)) + 0.5f)
 #define INT_ROUND_TEXCOORD_V(X) (int)(((X) * (float)(gHeight - 1)) + 0.5f)
 #define INT_TEXCOORD_U(X) (int)((X) * (float)(gWidth - 1))
@@ -121,28 +112,6 @@ static bool gBoxFilter = false;    // Perform a post-box filter on normal map?
 static int gDilateTexels = 0;      // How many texels to dilate.
 static bool gBumpMap = false;      // Treat input file like a height field
 
-//////////////////////////////////////////////////////////////////////////////
-//    From:
-//      Paper: http://www.acm.org/jgt/papers/MollerHughes99/
-//      Code:  http://www.acm.org/jgt/papers/MollerHughes99/code.html
-//////////////////////////////////////////////////////////////////////////////
-
-#define CROSS(dest, v1, v2)                                                                        \
-    {                                                                                              \
-        dest[0] = v1[1] * v2[2] - v1[2] * v2[1];                                                   \
-        dest[1] = v1[2] * v2[0] - v1[0] * v2[2];                                                   \
-        dest[2] = v1[0] * v2[1] - v1[1] * v2[0];                                                   \
-    }
-
-#define DOT(v1, v2) (v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2])
-
-#define SUB(dest, v1, v2)                                                                          \
-    {                                                                                              \
-        dest[0] = v1[0] - v2[0];                                                                   \
-        dest[1] = v1[1] - v2[1];                                                                   \
-        dest[2] = v1[2] - v2[2];                                                                   \
-    }
-
 /*
  * A function for creating a rotation matrix that rotates a vector called
  * "from" into another vector called "to".
@@ -158,8 +127,8 @@ fromToRotation(float from[3], float to[3], float mtx[3][3])
     float v[3];
     float e, h, f;
 
-    CROSS(v, from, to);
-    e = DOT(from, to);
+    VEC_Cross(from, to, v);
+    e = VEC_DotProduct(from, to);
     f = (e < 0) ? -e : e;
     if (f > 1.0 - EPSILON) /* "from" and "to"-vector almost parallel */
     {
@@ -197,9 +166,9 @@ fromToRotation(float from[3], float to[3], float mtx[3][3])
         v[1] = x[1] - to[1];
         v[2] = x[2] - to[2];
 
-        c1 = 2.0f / DOT(u, u);
-        c2 = 2.0f / DOT(v, v);
-        c3 = c1 * c2 * DOT(u, v);
+        c1 = 2.0f / VEC_DotProduct(u, u);
+        c2 = 2.0f / VEC_DotProduct(v, v);
+        c3 = c1 * c2 * VEC_DotProduct(u, v);
 
         for (i = 0; i < 3; i++) {
             for (j = 0; j < 3; j++) {

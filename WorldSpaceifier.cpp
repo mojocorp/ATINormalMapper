@@ -36,15 +36,6 @@ static char* versionString = "WorldSpaceifier v00.00.01\n";
 #define PACKINTOSHORT_SMINUS1TO1(x) ((short)((x)*32767.5))
 #define UNPACKSHORT_SMINUS1TO1(x) (((float)(x)) / 32767.5)
 
-#define VEC_Subtract(a, b, c)                                                                      \
-    ((c)[0] = (a)[0] - (b)[0], (c)[1] = (a)[1] - (b)[1], (c)[2] = (a)[2] - (b)[2])
-#define VEC_Add(a, b, c)                                                                           \
-    ((c)[0] = (a)[0] + (b)[0], (c)[1] = (a)[1] + (b)[1], (c)[2] = (a)[2] + (b)[2])
-#define VEC_Cross(a, b, c)                                                                         \
-    ((c)[0] = (a)[1] * (b)[2] - (a)[2] * (b)[1],                                                   \
-     (c)[1] = (a)[2] * (b)[0] - (a)[0] * (b)[2],                                                   \
-     (c)[2] = (a)[0] * (b)[1] - (a)[1] * (b)[0])
-#define VEC_DotProduct(a, b) ((a)[0] * (b)[0] + (a)[1] * (b)[1] + (a)[2] * (b)[2])
 #define INT_ROUND_TEXCOORD_U(X) (int)(((X) * (float)(gWidth - 1)) + 0.5f)
 #define INT_ROUND_TEXCOORD_V(X) (int)(((X) * (float)(gHeight - 1)) + 0.5f)
 #define INT_TEXCOORD_U(X) (int)((X) * (float)(gWidth - 1))
