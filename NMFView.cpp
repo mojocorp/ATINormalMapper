@@ -30,6 +30,7 @@
 #include "NmFileIO.h"
 #include "TGAIO.h"
 #include "NativeDialogs.h"
+#include "Utils.h"
 
 // Light parameters
 GLfloat gLightpos[] = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -170,24 +171,6 @@ vecMat3x3Mult(GLfloat vecIn[3], GLfloat m[16], GLfloat vecOut[3])
     vecOut[0] = (vecIn[0] * m[0]) + (vecIn[1] * m[4]) + (vecIn[2] * m[8]);
     vecOut[1] = (vecIn[0] * m[1]) + (vecIn[1] * m[5]) + (vecIn[2] * m[9]);
     vecOut[2] = (vecIn[0] * m[2]) + (vecIn[1] * m[6]) + (vecIn[2] * m[10]);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Normalize vector
-///////////////////////////////////////////////////////////////////////////////
-void
-Normalize(GLfloat vec[3])
-{
-    GLfloat sz = sqrt((vec[0] * vec[0]) + (vec[1] * vec[1]) + (vec[2] * vec[2]));
-    if ((sz > -0.0000001) && (sz < 0.0000001)) { // Don't divide by zero
-        vec[0] = 0.0f;
-        vec[1] = 0.0f;
-        vec[2] = 1.0f;
-    } else {
-        vec[0] = vec[0] / sz;
-        vec[1] = vec[1] / sz;
-        vec[2] = vec[2] / sz;
-    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -42,6 +42,7 @@ set(SOURCES
     TGAIO.cpp
     ArgFileIO.cpp
     NativeDialogs.cpp
+    Utils.cpp
 )
 add_library(Common STATIC ${SOURCES})
 

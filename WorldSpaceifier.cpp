@@ -20,6 +20,7 @@
 #include "ArgFileIO.h"
 #include "NmFileIO.h"
 #include "TGAIO.h"
+#include "Utils.h"
 
 static char* versionString = "WorldSpaceifier v00.00.01\n";
 
@@ -48,9 +49,6 @@ static char* versionString = "WorldSpaceifier v00.00.01\n";
 #define INT_ROUND_TEXCOORD_V(X) (int)(((X) * (float)(gHeight - 1)) + 0.5f)
 #define INT_TEXCOORD_U(X) (int)((X) * (float)(gWidth - 1))
 #define INT_TEXCOORD_V(X) (int)((X) * (float)(gHeight - 1))
-
-// Value that's close enough to be called 0.0
-#define EPSILON 1.0e-7
 
 static const double PI = 3.1415926535897932384626433832795;
 
@@ -150,28 +148,6 @@ static int gDbgX[gDbgNum] = { 157 };
 // Flip Y coordinate from Photoshop (subtract from height)
 static int gDbgY[gDbgNum] = { 1023 - 570 };
 #endif
-
-//////////////////////////////////////////////////////////////////////////////
-// Normalize a vector
-//////////////////////////////////////////////////////////////////////////////
-static void
-Normalize(double v[3])
-{
-    if (v == NULL) {
-        NmPrint("ERROR: NULL pointer passed to Normalize!\n");
-        exit(-1);
-    }
-    double len = sqrt((v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
-    if (len < EPSILON) {
-        v[0] = 1.0f;
-        v[1] = 0.0f;
-        v[2] = 0.0f;
-    } else {
-        v[0] = v[0] / len;
-        v[1] = v[1] / len;
-        v[2] = v[2] / len;
-    }
-}
 
 /////////////////////////////////////
 // Get edge info

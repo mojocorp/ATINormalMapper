@@ -22,6 +22,7 @@
 #include "AtiTriBoxMoller.h"
 #include "NmFileIO.h"
 #include "TGAIO.h"
+#include "Utils.h"
 
 static char* versionString = "NormalMapper v03.02.02\n";
 
@@ -50,9 +51,6 @@ static char* versionString = "NormalMapper v03.02.02\n";
 #define INT_ROUND_TEXCOORD_V(X) (int)(((X) * (float)(gHeight - 1)) + 0.5f)
 #define INT_TEXCOORD_U(X) (int)((X) * (float)(gWidth - 1))
 #define INT_TEXCOORD_V(X) (int)((X) * (float)(gHeight - 1))
-
-// Value that's close enough to be called 0.0
-#define EPSILON 1.0e-7
 
 static const double PI = 3.1415926535897932384626433832795;
 
@@ -301,28 +299,6 @@ GetSamples(int* numSamples, NmSample** samples)
     // Update number of samples
     (*numSamples) = num;
 } // GetSamples
-
-//////////////////////////////////////////////////////////////////////////////
-// Normalize a vector
-//////////////////////////////////////////////////////////////////////////////
-static void
-Normalize(double v[3])
-{
-    if (v == NULL) {
-        NmPrint("ERROR: NULL pointer passed to Normalize!\n");
-        exit(-1);
-    }
-    double len = sqrt((v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
-    if (len < EPSILON) {
-        v[0] = 1.0f;
-        v[1] = 0.0f;
-        v[2] = 0.0f;
-    } else {
-        v[0] = v[0] / len;
-        v[1] = v[1] / len;
-        v[2] = v[2] / len;
-    }
-}
 
 //////////////////////////////////////////////////////////////////////////
 // Test if the new normal is a better fit than the last one.
