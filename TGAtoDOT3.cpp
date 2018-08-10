@@ -38,6 +38,74 @@ PackFloatInByte(float in)
     return (uint8)((in + 1.0f) / 2.0f * 255.0f);
 }
 
+void
+SobelFilter(uint8* dstImage, uint8* srcImage, int width, int height, int bpp)
+{
+    pixel pix;
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            // Do Y Sobel filter
+            TGAReadPixel(srcImage, width, bpp / 8, &pix, (x - 1 + width) % width, (y + 1) % height);
+            float dY = ((float)pix.red) / 255.0f * -1.0f;
+
+            TGAReadPixel(srcImage, width, bpp / 8, &pix, x % width, (y + 1) % height);
+            dY += ((float)pix.red) / 255.0f * -2.0f;
+
+            TGAReadPixel(srcImage, width, bpp / 8, &pix, (x + 1) % width, (y + 1) % height);
+            dY += ((float)pix.red) / 255.0f * -1.0f;
+
+            TGAReadPixel(
+              srcImage, width, bpp / 8, &pix, (x - 1 + width) % width, (y - 1 + height) % height);
+            dY += ((float)pix.red) / 255.0f * 1.0f;
+
+            TGAReadPixel(srcImage, width, bpp / 8, &pix, x % width, (y - 1 + height) % height);
+            dY += ((float)pix.red) / 255.0f * 2.0f;
+
+            TGAReadPixel(
+              srcImage, width, bpp / 8, &pix, (x + 1) % width, (y - 1 + height) % height);
+            dY += ((float)pix.red) / 255.0f * 1.0f;
+
+            // Do X Sobel filter
+            TGAReadPixel(
+              srcImage, width, bpp / 8, &pix, (x - 1 + width) % width, (y - 1 + height) % height);
+            float dX = ((float)pix.red) / 255.0f * -1.0f;
+
+            TGAReadPixel(srcImage, width, bpp / 8, &pix, (x - 1 + width) % width, y % height);
+            dX += ((float)pix.red) / 255.0f * -2.0f;
+
+            TGAReadPixel(srcImage, width, bpp / 8, &pix, (x - 1 + width) % width, (y + 1) % height);
+            dX += ((float)pix.red) / 255.0f * -1.0f;
+
+            TGAReadPixel(
+              srcImage, width, bpp / 8, &pix, (x + 1) % width, (y - 1 + height) % height);
+            dX += ((float)pix.red) / 255.0f * 1.0f;
+
+            TGAReadPixel(srcImage, width, bpp / 8, &pix, (x + 1) % width, y % height);
+            dX += ((float)pix.red) / 255.0f * 2.0f;
+
+            TGAReadPixel(srcImage, width, bpp / 8, &pix, (x + 1) % width, (y + 1) % height);
+            dX += ((float)pix.red) / 255.0f * 1.0f;
+
+            // Cross Product of components of gradient reduces to
+            float nX = -dX;
+            float nY = -dY;
+            float nZ = 1;
+
+            // Normalize
+            float oolen = 1.0f / ((float)sqrt(nX * nX + nY * nY + nZ * nZ));
+            nX *= oolen;
+            nY *= oolen;
+            nZ *= oolen;
+
+            pix.red = (uint8)PackFloatInByte(nX);
+            pix.green = (uint8)PackFloatInByte(nY);
+            pix.blue = (uint8)PackFloatInByte(nZ);
+
+            WritePixel(dstImage, bpp, &pix, x, y);
+        }
+    }
+}
+
 #ifdef _WIN32
 int WINAPI
 WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow)
@@ -48,8 +116,6 @@ main(int argc, char** argv)
 {
     char buff[256 + 1024];
     FILE *finput, *foutput;
-
-    pixel pix;
 
     // Loop until the user cancels the open dialog
     while (TRUE) {
@@ -93,80 +159,7 @@ main(int argc, char** argv)
             continue;
         }
 
-        for (int y = 0; y < gHeight; y++) {
-            for (int x = 0; x < gWidth; x++) {
-                // Do Y Sobel filter
-                TGAReadPixel(
-                  srcImage, gWidth, bpp / 8, &pix, (x - 1 + gWidth) % gWidth, (y + 1) % gHeight);
-                float dY = ((float)pix.red) / 255.0f * -1.0f;
-
-                TGAReadPixel(srcImage, gWidth, bpp / 8, &pix, x % gWidth, (y + 1) % gHeight);
-                dY += ((float)pix.red) / 255.0f * -2.0f;
-
-                TGAReadPixel(srcImage, gWidth, bpp / 8, &pix, (x + 1) % gWidth, (y + 1) % gHeight);
-                dY += ((float)pix.red) / 255.0f * -1.0f;
-
-                TGAReadPixel(srcImage,
-                             gWidth,
-                             bpp / 8,
-                             &pix,
-                             (x - 1 + gWidth) % gWidth,
-                             (y - 1 + gHeight) % gHeight);
-                dY += ((float)pix.red) / 255.0f * 1.0f;
-
-                TGAReadPixel(
-                  srcImage, gWidth, bpp / 8, &pix, x % gWidth, (y - 1 + gHeight) % gHeight);
-                dY += ((float)pix.red) / 255.0f * 2.0f;
-
-                TGAReadPixel(
-                  srcImage, gWidth, bpp / 8, &pix, (x + 1) % gWidth, (y - 1 + gHeight) % gHeight);
-                dY += ((float)pix.red) / 255.0f * 1.0f;
-
-                // Do X Sobel filter
-                TGAReadPixel(srcImage,
-                             gWidth,
-                             bpp / 8,
-                             &pix,
-                             (x - 1 + gWidth) % gWidth,
-                             (y - 1 + gHeight) % gHeight);
-                float dX = ((float)pix.red) / 255.0f * -1.0f;
-
-                TGAReadPixel(
-                  srcImage, gWidth, bpp / 8, &pix, (x - 1 + gWidth) % gWidth, y % gHeight);
-                dX += ((float)pix.red) / 255.0f * -2.0f;
-
-                TGAReadPixel(
-                  srcImage, gWidth, bpp / 8, &pix, (x - 1 + gWidth) % gWidth, (y + 1) % gHeight);
-                dX += ((float)pix.red) / 255.0f * -1.0f;
-
-                TGAReadPixel(
-                  srcImage, gWidth, bpp / 8, &pix, (x + 1) % gWidth, (y - 1 + gHeight) % gHeight);
-                dX += ((float)pix.red) / 255.0f * 1.0f;
-
-                TGAReadPixel(srcImage, gWidth, bpp / 8, &pix, (x + 1) % gWidth, y % gHeight);
-                dX += ((float)pix.red) / 255.0f * 2.0f;
-
-                TGAReadPixel(srcImage, gWidth, bpp / 8, &pix, (x + 1) % gWidth, (y + 1) % gHeight);
-                dX += ((float)pix.red) / 255.0f * 1.0f;
-
-                // Cross Product of components of gradient reduces to
-                float nX = -dX;
-                float nY = -dY;
-                float nZ = 1;
-
-                // Normalize
-                float oolen = 1.0f / ((float)sqrt(nX * nX + nY * nY + nZ * nZ));
-                nX *= oolen;
-                nY *= oolen;
-                nZ *= oolen;
-
-                pix.red = (uint8)PackFloatInByte(nX);
-                pix.green = (uint8)PackFloatInByte(nY);
-                pix.blue = (uint8)PackFloatInByte(nZ);
-
-                WritePixel(dstImage, bpp, &pix, x, y);
-            }
-        }
+        SobelFilter(dstImage, srcImage, gWidth, gHeight, bpp);
 
         // Open output file
         if ((foutput = fopen(outFilename, "wb")) == NULL) {
