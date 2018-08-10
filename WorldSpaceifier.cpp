@@ -333,30 +333,6 @@ Fetch(float* map, int width, int height, double u, double v, double bumpN[3])
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Get a pixel from the image.
-//////////////////////////////////////////////////////////////////////////
-static inline void
-ReadPixel(uint8* image, int width, int off, pixel* pix, int x, int y)
-{
-#ifdef _DEBUG
-    if ((image == NULL) || (pix == NULL)) {
-        NmPrint("ERROR: NULL pointer passed to Readpixel!\n");
-        exit(-1);
-    }
-#endif
-    int idx = y * width * off + x * off;
-    if (off > 0) {
-        pix->red = image[idx];
-    }
-    if (off > 1) {
-        pix->blue = image[idx + 1];
-    }
-    if (off > 2) {
-        pix->green = image[idx + 2];
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////
 // Read a normal map from disk and convert it into a floating point image
 //////////////////////////////////////////////////////////////////////////
 static void
@@ -417,7 +393,7 @@ ReadNormalMap(char* name, int* width, int* height, int* numComponents, float** n
     for (int y = 0; y < (*height); y++) {
         for (int x = 0; x < (*width); x++) {
             // Read texel
-            ReadPixel(image, (*width), off, &pix, x, y);
+            TGAReadPixel(image, (*width), off, &pix, x, y);
 
             // Convert to a normal, special case 0.0 normal.
             double nn[3];
@@ -512,82 +488,82 @@ GetBumpMapFromHeightMap(char* bumpName,
     for (int y = 0; y < (*bumpHeight); y++) {
         for (int x = 0; x < (*bumpWidth); x++) {
             // Do Y Sobel filter
-            ReadPixel(image,
-                      (*bumpWidth),
-                      off,
-                      &pix,
-                      (x - 1 + (*bumpWidth)) % (*bumpWidth),
-                      (y + 1) % (*bumpHeight));
+            TGAReadPixel(image,
+                         (*bumpWidth),
+                         off,
+                         &pix,
+                         (x - 1 + (*bumpWidth)) % (*bumpWidth),
+                         (y + 1) % (*bumpHeight));
             dY = ((((float)pix.red) / 255.0f) * scale) * -1.0f;
 
-            ReadPixel(image, (*bumpWidth), off, &pix, x % (*bumpWidth), (y + 1) % (*bumpHeight));
+            TGAReadPixel(image, (*bumpWidth), off, &pix, x % (*bumpWidth), (y + 1) % (*bumpHeight));
             dY += ((((float)pix.red) / 255.0f) * scale) * -2.0f;
 
-            ReadPixel(
+            TGAReadPixel(
               image, (*bumpWidth), off, &pix, (x + 1) % (*bumpWidth), (y + 1) % (*bumpHeight));
             dY += ((((float)pix.red) / 255.0f) * scale) * -1.0f;
 
-            ReadPixel(image,
-                      (*bumpWidth),
-                      off,
-                      &pix,
-                      (x - 1 + (*bumpWidth)) % (*bumpWidth),
-                      (y - 1 + (*bumpHeight)) % (*bumpHeight));
+            TGAReadPixel(image,
+                         (*bumpWidth),
+                         off,
+                         &pix,
+                         (x - 1 + (*bumpWidth)) % (*bumpWidth),
+                         (y - 1 + (*bumpHeight)) % (*bumpHeight));
             dY += ((((float)pix.red) / 255.0f) * scale) * 1.0f;
 
-            ReadPixel(image,
-                      (*bumpWidth),
-                      off,
-                      &pix,
-                      x % (*bumpWidth),
-                      (y - 1 + (*bumpHeight)) % (*bumpHeight));
+            TGAReadPixel(image,
+                         (*bumpWidth),
+                         off,
+                         &pix,
+                         x % (*bumpWidth),
+                         (y - 1 + (*bumpHeight)) % (*bumpHeight));
             dY += ((((float)pix.red) / 255.0f) * scale) * 2.0f;
 
-            ReadPixel(image,
-                      (*bumpWidth),
-                      off,
-                      &pix,
-                      (x + 1) % (*bumpWidth),
-                      (y - 1 + (*bumpHeight)) % (*bumpHeight));
+            TGAReadPixel(image,
+                         (*bumpWidth),
+                         off,
+                         &pix,
+                         (x + 1) % (*bumpWidth),
+                         (y - 1 + (*bumpHeight)) % (*bumpHeight));
             dY += ((((float)pix.red) / 255.0f) * scale) * 1.0f;
 
             // Do X Sobel filter
-            ReadPixel(image,
-                      (*bumpWidth),
-                      off,
-                      &pix,
-                      (x - 1 + (*bumpWidth)) % (*bumpWidth),
-                      (y - 1 + (*bumpHeight)) % (*bumpHeight));
+            TGAReadPixel(image,
+                         (*bumpWidth),
+                         off,
+                         &pix,
+                         (x - 1 + (*bumpWidth)) % (*bumpWidth),
+                         (y - 1 + (*bumpHeight)) % (*bumpHeight));
             dX = ((((float)pix.red) / 255.0f) * scale) * -1.0f;
 
-            ReadPixel(image,
-                      (*bumpWidth),
-                      off,
-                      &pix,
-                      (x - 1 + (*bumpWidth)) % (*bumpWidth),
-                      y % (*bumpHeight));
+            TGAReadPixel(image,
+                         (*bumpWidth),
+                         off,
+                         &pix,
+                         (x - 1 + (*bumpWidth)) % (*bumpWidth),
+                         y % (*bumpHeight));
             dX += ((((float)pix.red) / 255.0f) * scale) * -2.0f;
 
-            ReadPixel(image,
-                      (*bumpWidth),
-                      off,
-                      &pix,
-                      (x - 1 + (*bumpWidth)) % (*bumpWidth),
-                      (y + 1) % (*bumpHeight));
+            TGAReadPixel(image,
+                         (*bumpWidth),
+                         off,
+                         &pix,
+                         (x - 1 + (*bumpWidth)) % (*bumpWidth),
+                         (y + 1) % (*bumpHeight));
             dX += ((((float)pix.red) / 255.0f) * scale) * -1.0f;
 
-            ReadPixel(image,
-                      (*bumpWidth),
-                      off,
-                      &pix,
-                      (x + 1) % (*bumpWidth),
-                      (y - 1 + (*bumpHeight)) % (*bumpHeight));
+            TGAReadPixel(image,
+                         (*bumpWidth),
+                         off,
+                         &pix,
+                         (x + 1) % (*bumpWidth),
+                         (y - 1 + (*bumpHeight)) % (*bumpHeight));
             dX += ((((float)pix.red) / 255.0f) * scale) * 1.0f;
 
-            ReadPixel(image, (*bumpWidth), off, &pix, (x + 1) % (*bumpWidth), y % (*bumpHeight));
+            TGAReadPixel(image, (*bumpWidth), off, &pix, (x + 1) % (*bumpWidth), y % (*bumpHeight));
             dX += ((((float)pix.red) / 255.0f) * scale) * 2.0f;
 
-            ReadPixel(
+            TGAReadPixel(
               image, (*bumpWidth), off, &pix, (x + 1) % (*bumpWidth), (y + 1) % (*bumpHeight));
             dX += ((((float)pix.red) / 255.0f) * scale) * 1.0f;
 

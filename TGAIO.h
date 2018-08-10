@@ -43,6 +43,30 @@ typedef struct _pixel
 
 #pragma pack(pop)
 
+//////////////////////////////////////////////////////////////////////////
+// Get a pixel from the image.
+//////////////////////////////////////////////////////////////////////////
+inline void
+TGAReadPixel(uint8* image, int width, int off, pixel* pix, int x, int y)
+{
+#ifdef _DEBUG
+    if ((image == NULL) || (pix == NULL)) {
+        NmPrint("ERROR: NULL pointer passed to Readpixel!\n");
+        exit(-1);
+    }
+#endif
+    int idx = y * width * off + x * off;
+    if (off > 0) {
+        pix->red = image[idx];
+    }
+    if (off > 1) {
+        pix->blue = image[idx + 1];
+    }
+    if (off > 2) {
+        pix->green = image[idx + 2];
+    }
+}
+
 extern bool
 TGAWriteImage(FILE* fp, int width, int height, int bpp, uint8* image, bool aSwapRedBlue = false);
 extern bool

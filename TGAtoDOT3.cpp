@@ -32,16 +32,6 @@ WritePixel(uint8* image, int bpp, const pixel* pix, int x, int y)
     }
 }
 
-void
-ReadPixel(const uint8* image, int bpp, pixel* pix, int x, int y)
-{
-    const int idx = (x + y * gWidth) * (bpp / 8);
-
-    pix->blue = image[idx + 0];
-    pix->green = image[idx + 1];
-    pix->red = image[idx + 2];
-}
-
 uint8
 PackFloatInByte(float in)
 {
@@ -106,43 +96,57 @@ main(int argc, char** argv)
         for (int y = 0; y < gHeight; y++) {
             for (int x = 0; x < gWidth; x++) {
                 // Do Y Sobel filter
-                ReadPixel(srcImage, bpp, &pix, (x - 1 + gWidth) % gWidth, (y + 1) % gHeight);
+                TGAReadPixel(
+                  srcImage, gWidth, bpp / 8, &pix, (x - 1 + gWidth) % gWidth, (y + 1) % gHeight);
                 float dY = ((float)pix.red) / 255.0f * -1.0f;
 
-                ReadPixel(srcImage, bpp, &pix, x % gWidth, (y + 1) % gHeight);
+                TGAReadPixel(srcImage, gWidth, bpp / 8, &pix, x % gWidth, (y + 1) % gHeight);
                 dY += ((float)pix.red) / 255.0f * -2.0f;
 
-                ReadPixel(srcImage, bpp, &pix, (x + 1) % gWidth, (y + 1) % gHeight);
+                TGAReadPixel(srcImage, gWidth, bpp / 8, &pix, (x + 1) % gWidth, (y + 1) % gHeight);
                 dY += ((float)pix.red) / 255.0f * -1.0f;
 
-                ReadPixel(
-                  srcImage, bpp, &pix, (x - 1 + gWidth) % gWidth, (y - 1 + gHeight) % gHeight);
+                TGAReadPixel(srcImage,
+                             gWidth,
+                             bpp / 8,
+                             &pix,
+                             (x - 1 + gWidth) % gWidth,
+                             (y - 1 + gHeight) % gHeight);
                 dY += ((float)pix.red) / 255.0f * 1.0f;
 
-                ReadPixel(srcImage, bpp, &pix, x % gWidth, (y - 1 + gHeight) % gHeight);
+                TGAReadPixel(
+                  srcImage, gWidth, bpp / 8, &pix, x % gWidth, (y - 1 + gHeight) % gHeight);
                 dY += ((float)pix.red) / 255.0f * 2.0f;
 
-                ReadPixel(srcImage, bpp, &pix, (x + 1) % gWidth, (y - 1 + gHeight) % gHeight);
+                TGAReadPixel(
+                  srcImage, gWidth, bpp / 8, &pix, (x + 1) % gWidth, (y - 1 + gHeight) % gHeight);
                 dY += ((float)pix.red) / 255.0f * 1.0f;
 
                 // Do X Sobel filter
-                ReadPixel(
-                  srcImage, bpp, &pix, (x - 1 + gWidth) % gWidth, (y - 1 + gHeight) % gHeight);
+                TGAReadPixel(srcImage,
+                             gWidth,
+                             bpp / 8,
+                             &pix,
+                             (x - 1 + gWidth) % gWidth,
+                             (y - 1 + gHeight) % gHeight);
                 float dX = ((float)pix.red) / 255.0f * -1.0f;
 
-                ReadPixel(srcImage, bpp, &pix, (x - 1 + gWidth) % gWidth, y % gHeight);
+                TGAReadPixel(
+                  srcImage, gWidth, bpp / 8, &pix, (x - 1 + gWidth) % gWidth, y % gHeight);
                 dX += ((float)pix.red) / 255.0f * -2.0f;
 
-                ReadPixel(srcImage, bpp, &pix, (x - 1 + gWidth) % gWidth, (y + 1) % gHeight);
+                TGAReadPixel(
+                  srcImage, gWidth, bpp / 8, &pix, (x - 1 + gWidth) % gWidth, (y + 1) % gHeight);
                 dX += ((float)pix.red) / 255.0f * -1.0f;
 
-                ReadPixel(srcImage, bpp, &pix, (x + 1) % gWidth, (y - 1 + gHeight) % gHeight);
+                TGAReadPixel(
+                  srcImage, gWidth, bpp / 8, &pix, (x + 1) % gWidth, (y - 1 + gHeight) % gHeight);
                 dX += ((float)pix.red) / 255.0f * 1.0f;
 
-                ReadPixel(srcImage, bpp, &pix, (x + 1) % gWidth, y % gHeight);
+                TGAReadPixel(srcImage, gWidth, bpp / 8, &pix, (x + 1) % gWidth, y % gHeight);
                 dX += ((float)pix.red) / 255.0f * 2.0f;
 
-                ReadPixel(srcImage, bpp, &pix, (x + 1) % gWidth, (y + 1) % gHeight);
+                TGAReadPixel(srcImage, gWidth, bpp / 8, &pix, (x + 1) % gWidth, (y + 1) % gHeight);
                 dX += ((float)pix.red) / 255.0f * 1.0f;
 
                 // Cross Product of components of gradient reduces to
