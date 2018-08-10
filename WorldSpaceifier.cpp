@@ -733,22 +733,6 @@ GenerateTangents(NmTangentMatrix** tangentSpace, int numTris, NmRawTriangle* tri
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Interpolate position and normal given the Barycentric cooridnates.
-//////////////////////////////////////////////////////////////////////////
-static inline void
-BaryInterpolate(NmRawTriangle* tri, double b1, double b2, double b3, double pos[3], double nrm[3])
-{
-    pos[0] = (tri->vert[0].x * b1) + (tri->vert[1].x * b2) + (tri->vert[2].x * b3);
-    pos[1] = (tri->vert[0].y * b1) + (tri->vert[1].y * b2) + (tri->vert[2].y * b3);
-    pos[2] = (tri->vert[0].z * b1) + (tri->vert[1].z * b2) + (tri->vert[2].z * b3);
-
-    nrm[0] = (tri->norm[0].x * b1) + (tri->norm[1].x * b2) + (tri->norm[2].x * b3);
-    nrm[1] = (tri->norm[0].y * b1) + (tri->norm[1].y * b2) + (tri->norm[2].y * b3);
-    nrm[2] = (tri->norm[0].z * b1) + (tri->norm[1].z * b2) + (tri->norm[2].z * b3);
-    Normalize(nrm);
-}
-
-//////////////////////////////////////////////////////////////////////////
 // Get the sorted edges from the given triangle
 //////////////////////////////////////////////////////////////////////////
 static void
