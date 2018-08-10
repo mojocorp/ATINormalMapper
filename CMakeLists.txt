@@ -37,10 +37,17 @@ else()
 endif()
 
 set(SOURCES
+    GL/glext.h
+    Types.h
+    Utils.h
     NMFConvert.cpp
+    NmFileIO.h
     NmFileIO.cpp
+    TGAIO.h
     TGAIO.cpp
+    ArgFileIO.h
     ArgFileIO.cpp
+    NativeDialogs.h
     NativeDialogs.cpp
 )
 add_library(Common STATIC ${SOURCES})
@@ -83,7 +90,9 @@ add_executable(NormalMapCombiner ${SOURCES})
 target_link_libraries (NormalMapCombiner LINK_PUBLIC Common)
 
 set(SOURCES
+    AtiOctree.h
     AtiOctree.cpp
+    AtiTriBoxMoller.h
     AtiTriBoxMoller.cpp
     NormalMapper.cpp
     NormalMapper.rc
