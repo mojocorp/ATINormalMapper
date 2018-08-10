@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include "NmFileIO.h"
+#include "Utils.h"
 
 using namespace std;
 
@@ -256,24 +257,6 @@ NmComputeTangents(int numTris, NmRawTriangle* tris, NmRawTangentSpace** tan)
 } // end NmComputeTangents
 
 //==========================================================================
-// Normalize a vector
-//==========================================================================
-static inline void
-NormalizeD(double v[3])
-{
-    double len = sqrt((v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
-    if (len < EPSILON) {
-        v[0] = 1.0;
-        v[1] = 0.0;
-        v[2] = 0.0;
-    } else {
-        v[0] = v[0] / len;
-        v[1] = v[1] / len;
-        v[2] = v[2] / len;
-    }
-}
-
-//==========================================================================
 // Calculates the dot product of two vectors.
 //==========================================================================
 static inline double
@@ -323,9 +306,9 @@ NmCompareD(NmTangentPointD* v0, NmTangentPointD* v1)
 
     // Tangent
     double t0[3] = { v0->tangent[0], v0->tangent[1], v0->tangent[2] };
-    NormalizeD(t0);
+    Normalize(t0);
     double t1[3] = { v1->tangent[0], v1->tangent[1], v1->tangent[2] };
-    NormalizeD(t1);
+    Normalize(t1);
     double dp3 = DotProduct3D(t0, t1);
     if (dp3 < ATI_TAN_ANGLE) {
         for (int i = 0; i < 3; i++) {
@@ -339,9 +322,9 @@ NmCompareD(NmTangentPointD* v0, NmTangentPointD* v1)
 
     // Binormal
     double b0[3] = { v0->binormal[0], v0->binormal[1], v0->binormal[2] };
-    NormalizeD(b0);
+    Normalize(b0);
     double b1[3] = { v1->binormal[0], v1->binormal[1], v1->binormal[2] };
-    NormalizeD(b1);
+    Normalize(b1);
     dp3 = DotProduct3D(b0, b1);
     if (dp3 < ATI_TAN_ANGLE) {
         for (int i = 0; i < 3; i++) {
@@ -450,9 +433,9 @@ NmCompareNoTexD(NmTangentPointD* v0, NmTangentPointD* v1)
 
     // Tangent
     double t0[3] = { v0->tangent[0], v0->tangent[1], v0->tangent[2] };
-    NormalizeD(t0);
+    Normalize(t0);
     double t1[3] = { v1->tangent[0], v1->tangent[1], v1->tangent[2] };
-    NormalizeD(t1);
+    Normalize(t1);
     double dp3 = DotProduct3D(t0, t1);
     if (dp3 < ATI_TAN_ANGLE) {
         for (int i = 0; i < 3; i++) {
@@ -466,9 +449,9 @@ NmCompareNoTexD(NmTangentPointD* v0, NmTangentPointD* v1)
 
     // Binormal
     double b0[3] = { v0->binormal[0], v0->binormal[1], v0->binormal[2] };
-    NormalizeD(b0);
+    Normalize(b0);
     double b1[3] = { v1->binormal[0], v1->binormal[1], v1->binormal[2] };
-    NormalizeD(b1);
+    Normalize(b1);
     dp3 = DotProduct3D(b0, b1);
     if (dp3 < ATI_TAN_ANGLE) {
         for (int i = 0; i < 3; i++) {
@@ -1060,12 +1043,12 @@ NmComputeTangentsD(int numTris, NmRawTriangle* tris, NmRawTangentSpaceD** tan)
         point[i].tangent[0] = point[i].tangent[0] / (double)point[i].count;
         point[i].tangent[1] = point[i].tangent[1] / (double)point[i].count;
         point[i].tangent[2] = point[i].tangent[2] / (double)point[i].count;
-        NormalizeD(point[i].tangent);
+        Normalize(point[i].tangent);
 
         point[i].binormal[0] = point[i].binormal[0] / (double)point[i].count;
         point[i].binormal[1] = point[i].binormal[1] / (double)point[i].count;
         point[i].binormal[2] = point[i].binormal[2] / (double)point[i].count;
-        NormalizeD(point[i].binormal);
+        Normalize(point[i].binormal);
     }
 
     // Copy tangent data into structures
@@ -1148,12 +1131,12 @@ NmCreateVertexBuffers(int numTris,
         point[i].tangent[0] = point[i].tangent[0] / (double)point[i].count;
         point[i].tangent[1] = point[i].tangent[1] / (double)point[i].count;
         point[i].tangent[2] = point[i].tangent[2] / (double)point[i].count;
-        NormalizeD(point[i].tangent);
+        Normalize(point[i].tangent);
 
         point[i].binormal[0] = point[i].binormal[0] / (double)point[i].count;
         point[i].binormal[1] = point[i].binormal[1] / (double)point[i].count;
         point[i].binormal[2] = point[i].binormal[2] / (double)point[i].count;
-        NormalizeD(point[i].binormal);
+        Normalize(point[i].binormal);
     }
 #endif
 
