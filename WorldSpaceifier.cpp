@@ -227,50 +227,6 @@ ShowSpinner(char* header = NULL)
     }
 }
 
-////////////////////////////////////////////////////////////////////
-// Multiply a 3x3 matrix with a 3 space vector (assuming w = 1), ignoring
-// the last row of the matrix
-////////////////////////////////////////////////////////////////////
-static void
-ConvertFromTangentSpace(double* m, double* vec, double* result)
-{
-    if ((m == NULL) || (vec == NULL) || (result == NULL)) {
-        NmPrint("ERROR: NULL pointer pased to ConvertFromTangentSpace\n");
-        exit(-1);
-    }
-
-    double tmp[3];
-    tmp[0] = vec[0] * m[0] + vec[1] * m[1] + vec[2] * m[2];
-    tmp[1] = vec[0] * m[3] + vec[1] * m[4] + vec[2] * m[5];
-    tmp[2] = vec[0] * m[6] + vec[1] * m[7] + vec[2] * m[8];
-
-    result[0] = tmp[0];
-    result[1] = tmp[1];
-    result[2] = tmp[2];
-}
-
-////////////////////////////////////////////////////////////////////
-// Multiply a 3x3 matrix with a 3 space vector (assuming w = 1), ignoring
-// the last row of the matrix
-////////////////////////////////////////////////////////////////////
-static void
-ConvertToTangentSpace(double* m, double* vec, double* result)
-{
-    if ((m == NULL) || (vec == NULL) || (result == NULL)) {
-        NmPrint("ERROR: NULL pointer pased to ConvertFromTangentSpace\n");
-        exit(-1);
-    }
-
-    double tmp[3];
-    tmp[0] = vec[0] * m[0] + vec[1] * m[3] + vec[2] * m[6];
-    tmp[1] = vec[0] * m[1] + vec[1] * m[4] + vec[2] * m[7];
-    tmp[2] = vec[0] * m[2] + vec[1] * m[5] + vec[2] * m[8];
-
-    result[0] = tmp[0];
-    result[1] = tmp[1];
-    result[2] = tmp[2];
-}
-
 //////////////////////////////////////////////////////////////////////////
 // Convert to experimental pixel format. Divide by the maximum of the
 // absloute value of x, y, or 1-z and store the maximum in alpha.
